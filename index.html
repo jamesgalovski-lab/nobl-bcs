@@ -222,80 +222,10 @@ input[type="file"] { display: none; }
     </div>
     <div class="field-group">
       <label class="field-label">Breed</label>
-      <select class="text-input" id="dog-breed" onchange="onBreedChange()" style="display:block!important;width:100%!important;min-height:44px!important;visibility:visible!important;opacity:1!important;-webkit-appearance:menulist!important;appearance:menulist!important;">
-        <option value="">Select breed...</option>
-        <optgroup label="Toy & Small Breeds">
-          <option value="chihuahua">Chihuahua</option>
-          <option value="yorkshire_terrier">Yorkshire Terrier</option>
-          <option value="maltese">Maltese</option>
-          <option value="pomeranian">Pomeranian</option>
-          <option value="shih_tzu">Shih Tzu</option>
-          <option value="miniature_dachshund">Miniature Dachshund</option>
-          <option value="toy_poodle">Toy Poodle</option>
-          <option value="miniature_pinscher">Miniature Pinscher</option>
-          <option value="papillon">Papillon</option>
-          <option value="italian_greyhound">Italian Greyhound</option>
-        </optgroup>
-        <optgroup label="Small–Medium Breeds">
-          <option value="beagle">Beagle</option>
-          <option value="french_bulldog">French Bulldog</option>
-          <option value="cavalier_king_charles">Cavalier King Charles Spaniel</option>
-          <option value="cocker_spaniel">Cocker Spaniel</option>
-          <option value="miniature_schnauzer">Miniature Schnauzer</option>
-          <option value="west_highland_terrier">West Highland White Terrier</option>
-          <option value="pug">Pug</option>
-          <option value="boston_terrier">Boston Terrier</option>
-          <option value="basenji">Basenji</option>
-          <option value="corgi">Corgi (Pembroke/Cardigan)</option>
-        </optgroup>
-        <optgroup label="Medium Breeds">
-          <option value="border_collie">Border Collie</option>
-          <option value="australian_shepherd">Australian Shepherd</option>
-          <option value="english_springer_spaniel">English Springer Spaniel</option>
-          <option value="standard_poodle">Standard Poodle</option>
-          <option value="whippet">Whippet</option>
-          <option value="american_staffordshire">American Staffordshire Terrier</option>
-          <option value="siberian_husky">Siberian Husky</option>
-          <option value="dalmatian">Dalmatian</option>
-          <option value="brittany">Brittany Spaniel</option>
-          <option value="vizsla">Vizsla</option>
-        </optgroup>
-        <optgroup label="Large Breeds">
-          <option value="labrador">Labrador Retriever</option>
-          <option value="golden_retriever">Golden Retriever</option>
-          <option value="german_shepherd">German Shepherd</option>
-          <option value="rottweiler">Rottweiler</option>
-          <option value="doberman">Doberman Pinscher</option>
-          <option value="weimaraner">Weimaraner</option>
-          <option value="belgian_malinois">Belgian Malinois</option>
-          <option value="boxer">Boxer</option>
-          <option value="standard_dachshund">Standard Dachshund</option>
-          <option value="irish_setter">Irish Setter</option>
-        </optgroup>
-        <optgroup label="Giant Breeds">
-          <option value="great_dane">Great Dane</option>
-          <option value="saint_bernard">Saint Bernard</option>
-          <option value="newfoundland">Newfoundland</option>
-          <option value="bernese_mountain_dog">Bernese Mountain Dog</option>
-          <option value="great_pyrenees">Great Pyrenees</option>
-          <option value="mastiff">Mastiff (English/Bull)</option>
-          <option value="irish_wolfhound">Irish Wolfhound</option>
-          <option value="leonberger">Leonberger</option>
-        </optgroup>
-        <optgroup label="Sighthounds (naturally lean)">
-          <option value="greyhound">Greyhound</option>
-          <option value="whippet_sight">Whippet (sighthound)</option>
-          <option value="saluki">Saluki</option>
-          <option value="borzoi">Borzoi</option>
-          <option value="azawakh">Azawakh</option>
-        </optgroup>
-        <optgroup label="Mixed / Other">
-          <option value="mixed_small">Mixed breed — small</option>
-          <option value="mixed_medium">Mixed breed — medium</option>
-          <option value="mixed_large">Mixed breed — large</option>
-          <option value="other">Other / Unknown</option>
-        </optgroup>
-      </select>
+      <input class="text-input" id="breed-search" type="text" placeholder="Type to search breed (e.g. Labrador, Pug)..." autocomplete="off" oninput="filterBreeds()" onfocus="showBreedList()" style="margin-bottom:0;" />
+      <input type="hidden" id="dog-breed" value="" />
+      <div id="breed-dropdown" style="display:none;border:1px solid #C5D8D2;border-top:none;border-radius:0 0 4px 4px;background:#fff;max-height:220px;overflow-y:auto;"></div>
+      <div id="breed-selected" style="display:none;margin-top:6px;padding:6px 12px;background:#E6EFEC;border-radius:4px;font-size:13px;color:#2D5147;font-weight:600;"></div>
     </div>
 
     <!-- Breed-specific note -->
@@ -564,6 +494,66 @@ const BREED_NOTES = {
   boxer: { note: "Boxers should be lean and muscular. They can look heavy-chested but should have a clear waist and palpable ribs.", adjust: 0 },
 };
 
+// ── Breed search data ──
+const ALL_BREEDS = [
+  {v:'chihuahua',l:'Chihuahua'},{v:'yorkshire_terrier',l:'Yorkshire Terrier'},{v:'maltese',l:'Maltese'},
+  {v:'pomeranian',l:'Pomeranian'},{v:'shih_tzu',l:'Shih Tzu'},{v:'miniature_dachshund',l:'Miniature Dachshund'},
+  {v:'toy_poodle',l:'Toy Poodle'},{v:'miniature_pinscher',l:'Miniature Pinscher'},{v:'papillon',l:'Papillon'},
+  {v:'italian_greyhound',l:'Italian Greyhound'},{v:'beagle',l:'Beagle'},{v:'french_bulldog',l:'French Bulldog'},
+  {v:'cavalier_king_charles',l:'Cavalier King Charles Spaniel'},{v:'cocker_spaniel',l:'Cocker Spaniel'},
+  {v:'miniature_schnauzer',l:'Miniature Schnauzer'},{v:'west_highland_terrier',l:'West Highland White Terrier'},
+  {v:'pug',l:'Pug'},{v:'boston_terrier',l:'Boston Terrier'},{v:'basenji',l:'Basenji'},
+  {v:'corgi',l:'Corgi (Pembroke/Cardigan)'},{v:'border_collie',l:'Border Collie'},
+  {v:'australian_shepherd',l:'Australian Shepherd'},{v:'english_springer_spaniel',l:'English Springer Spaniel'},
+  {v:'standard_poodle',l:'Standard Poodle'},{v:'whippet',l:'Whippet'},
+  {v:'american_staffordshire',l:'American Staffordshire Terrier'},{v:'siberian_husky',l:'Siberian Husky'},
+  {v:'dalmatian',l:'Dalmatian'},{v:'brittany',l:'Brittany Spaniel'},{v:'vizsla',l:'Vizsla'},
+  {v:'labrador',l:'Labrador Retriever'},{v:'golden_retriever',l:'Golden Retriever'},
+  {v:'german_shepherd',l:'German Shepherd'},{v:'rottweiler',l:'Rottweiler'},
+  {v:'doberman',l:'Doberman Pinscher'},{v:'weimaraner',l:'Weimaraner'},
+  {v:'belgian_malinois',l:'Belgian Malinois'},{v:'boxer',l:'Boxer'},
+  {v:'standard_dachshund',l:'Standard Dachshund'},{v:'irish_setter',l:'Irish Setter'},
+  {v:'great_dane',l:'Great Dane'},{v:'saint_bernard',l:'Saint Bernard'},
+  {v:'newfoundland',l:'Newfoundland'},{v:'bernese_mountain_dog',l:'Bernese Mountain Dog'},
+  {v:'great_pyrenees',l:'Great Pyrenees'},{v:'mastiff',l:'Mastiff (English/Bull)'},
+  {v:'irish_wolfhound',l:'Irish Wolfhound'},{v:'leonberger',l:'Leonberger'},
+  {v:'greyhound',l:'Greyhound'},{v:'whippet_sight',l:'Whippet (sighthound)'},
+  {v:'saluki',l:'Saluki'},{v:'borzoi',l:'Borzoi'},{v:'azawakh',l:'Azawakh'},
+  {v:'mixed_small',l:'Mixed breed — small'},{v:'mixed_medium',l:'Mixed breed — medium'},
+  {v:'mixed_large',l:'Mixed breed — large'},{v:'other',l:'Other / Unknown'}
+];
+
+function showBreedList() {
+  const q = document.getElementById('breed-search').value.trim().toLowerCase();
+  const dd = document.getElementById('breed-dropdown');
+  const filtered = q ? ALL_BREEDS.filter(b => b.l.toLowerCase().includes(q)) : ALL_BREEDS;
+  renderBreedDropdown(filtered);
+  dd.style.display = filtered.length ? 'block' : 'none';
+}
+
+function filterBreeds() {
+  showBreedList();
+}
+
+function renderBreedDropdown(breeds) {
+  const dd = document.getElementById('breed-dropdown');
+  dd.innerHTML = breeds.map(b =>
+    `<div onclick="selectBreed('${b.v}','${b.l.replace(/'/g,"&#39;")}')"
+      style="padding:9px 14px;font-size:13px;color:#3D5C54;cursor:pointer;border-top:1px solid #E6EFEC;"
+      onmouseover="this.style.background='#E6EFEC'" onmouseout="this.style.background=''">${b.l}</div>`
+  ).join('');
+}
+
+function selectBreed(value, label) {
+  document.getElementById('dog-breed').value = value;
+  document.getElementById('breed-search').value = label;
+  document.getElementById('breed-dropdown').style.display = 'none';
+  const sel = document.getElementById('breed-selected');
+  sel.textContent = '✓ ' + label;
+  sel.style.display = 'block';
+  onBreedChange();
+}
+
 function onBreedChange() {
   const breed = document.getElementById('dog-breed').value;
   const noteEl = document.getElementById('breed-note');
@@ -581,9 +571,17 @@ function getBreedAdjustment() {
 }
 
 function getBreedName() {
-  const sel = document.getElementById('dog-breed');
-  return sel.options[sel.selectedIndex]?.text || '';
+  const breed = document.getElementById('dog-breed').value;
+  const found = ALL_BREEDS.find(b => b.v === breed);
+  return found ? found.l : '';
 }
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#breed-search') && !e.target.closest('#breed-dropdown')) {
+    document.getElementById('breed-dropdown').style.display = 'none';
+  }
+});
 
 // ─────────────────────────────────────────────────────────────
 // NAVIGATION
@@ -1210,6 +1208,9 @@ function resetApp() {
   document.getElementById('dog-name').value = '';
   document.getElementById('dog-weight').value = '';
   document.getElementById('dog-breed').value = '';
+  document.getElementById('breed-search').value = '';
+  document.getElementById('breed-selected').style.display = 'none';
+  document.getElementById('breed-dropdown').style.display = 'none';
   document.getElementById('breed-note').classList.remove('visible');
   ['side-preview','top-preview'].forEach(id => { const el=document.getElementById(id); el.src=''; el.style.display='none'; });
   ['side-zone','top-zone'].forEach(id => { const el=document.getElementById(id); el.classList.remove('has-img','photo-warn'); });
