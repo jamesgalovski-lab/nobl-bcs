@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NOBL · Body Condition Score</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-dark:  #2D5147;
+    --green-mid:   #3D6B5E;
+    --green-light: #5A8C7A;
+    --green-pale:  #C8DDD7;
+    --green-bg:    #E6EFEC;
+    --page-bg:     #EDECEA;
+    --card-bg:     #FFFFFF;
+    --text-dark:   #1C3530;
+    --text-mid:    #3D5C54;
+    --text-muted:  #7A9990;
+    --text-label:  #4A7A6D;
+    --border:      #C5D8D2;
+    --red:         #C0392B;
+    --red-bg:      #FAEAE8;
+    --red-border:  #E8B8B4;
+    --amber:       #B0621A;
+    --amber-bg:    #FAF0E6;
+    --ideal:       #2A7A5A;
+    --ideal-bg:    #E2F2EC;
+  }
+
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: var(--page-bg);
+    color: var(--text-dark);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .nobl-header {
+    background: var(--green-dark);
+    padding: 14px 28px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .nobl-logo {
+    font-family: Georgia, serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: #fff;
+    letter-spacing: 0.06em;
+  }
+  .nobl-sub {
+    font-size: 10px;
+    color: var(--green-pale);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* ── Layout ── */
+  .page-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem 1rem 4rem;
+  }
+  .card {
+    background: var(--card-bg);
+    border-radius: 6px;
+    padding: 2rem 2rem 2.5rem;
+    width: 100%;
+    max-width: 580px;
+    box-shadow: 0 2px 8px rgba(44,80,70,0.07);
+  }
+
+  /* ── Steps ── */
+  .step { display: none; }
+  .step.active { display: block; }
+
+  /* ── Progress bar ── */
+  .progress-row { display: flex; gap: 5px; margin-bottom: 1.75rem; }
+  .prog-seg {
+    height: 3px;
+    flex: 1;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.25s;
+  }
+  .prog-seg.done   { background: var(--green-dark); }
+  .prog-seg.active { background: var(--green-light); }
+
+  /* ── Typography ── */
+  .step-badge {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .card-heading {
+    font-family: Georgia, serif;
+    font-size: 24px;
+    color: var(--text-dark);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  .card-sub {
+    font-size: 14px;
+    color: var(--text-mid);
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
+  }
+  .field-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-label);
+    font-weight: 600;
+    margin-bottom: 7px;
+  }
+  .field-group { margin-bottom: 1.35rem; }
+
+  /* ── Text input ── */
+  .text-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .text-input:focus {
+    border-color: var(--green-mid);
+    box-shadow: 0 0 0 2px rgba(61,107,94,0.14);
+  }
+  .text-input::placeholder { color: #B5CECA; }
+
+  /* ── Option buttons ── */
+  .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .opt-grid-1 { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  .opt {
+    padding: 10px 13px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    background: #fff;
+    line-height: 1.4;
+  }
+  .opt:hover { border-color: var(--green-mid); background: var(--green-bg); color: var(--text-dark); }
+  .opt.sel   { border-color: var(--green-dark); background: var(--green-bg); color: var(--green-dark); font-weight: 600; }
+
+  /* ── Upload zone ── */
+  .upload-zone {
+    display: block;
+    border: 1.5px dashed var(--border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .upload-zone:hover { border-color: var(--green-mid); background: var(--green-bg); }
+  .upload-zone.has-img { border-style: solid; border-color: var(--green-mid); background: #f0faf6; }
+  .upload-icon { font-size: 22px; margin-bottom: 6px; }
+  .upload-label { font-size: 13px; color: var(--text-label); font-weight: 600; margin-bottom: 3px; }
+  .upload-hint  { font-size: 12px; color: var(--text-muted); }
+  .upload-badge { display: inline-block; margin-top: 8px; background: var(--green-bg); color: var(--green-dark); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; padding: 3px 10px; border-radius: 20px; }
+  .preview-img  { width: 100%; max-height: 200px; object-fit: contain; border-radius: 4px; margin-top: 10px; }
+  input[type="file"] { display: none; }
+
+  .upload-tip {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* ── Buttons ── */
+  .btn-row { display: flex; gap: 10px; margin-top: 1.75rem; align-items: center; flex-wrap: wrap; }
+  .btn {
+    padding: 11px 22px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+    border: 1.5px solid var(--border);
+    background: #fff;
+    color: var(--text-mid);
+  }
+  .btn:hover { background: var(--green-bg); border-color: var(--green-mid); color: var(--green-dark); }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--green-dark); border-color: var(--green-dark); color: #fff; }
+  .btn-primary:hover { background: var(--green-mid); border-color: var(--green-mid); }
+  .skip-link { font-size: 12px; color: var(--text-muted); cursor: pointer; margin-left: auto; }
+  .skip-link:hover { color: var(--text-mid); }
+
+  /* ── Divider ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+
+  /* ── Loading ── */
+  .loading-wrap { text-align: center; padding: 3.5rem 1rem; }
+  .spinner {
+    width: 30px; height: 30px;
+    border: 2.5px solid var(--green-pale);
+    border-top-color: var(--green-dark);
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-msg { font-size: 13px; color: var(--text-muted); }
+  .loading-sub { font-size: 12px; color: var(--green-pale); margin-top: 6px; font-style: italic; }
+
+  /* ── Results ── */
+  .result-banner {
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .bcs-number { font-family: Georgia, serif; font-size: 58px; font-weight: 700; line-height: 1; }
+  .bcs-denom  { font-size: 24px; opacity: 0.45; margin-left: 2px; }
+  .bcs-label-text { font-size: 15px; font-weight: 700; margin-top: 4px; letter-spacing: 0.04em; }
+  .bcs-status { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7; margin-top: 2px; }
+  .bcs-desc-text { font-size: 13px; margin-top: 8px; line-height: 1.65; opacity: 0.88; }
+
+  .bcs-bar { display: flex; gap: 3px; margin: 1.1rem 0 3px; }
+  .bcs-seg { flex: 1; height: 7px; border-radius: 3px; opacity: 0.18; transition: all 0.3s; }
+  .bcs-seg.cur { opacity: 1; transform: scaleY(1.7); }
+  .bar-labels {
+    display: flex; justify-content: space-between;
+    font-size: 10px; color: var(--text-muted);
+    letter-spacing: 0.07em; text-transform: uppercase;
+    margin-bottom: 1.25rem;
+  }
+
+  /* weight range callout */
+  .weight-callout {
+    background: var(--green-bg);
+    border: 1px solid var(--green-pale);
+    border-left: 4px solid var(--green-dark);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .weight-callout-label {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    font-weight: 700; color: var(--green-dark); margin-bottom: 6px;
+  }
+  .weight-range { font-family: Georgia, serif; font-size: 28px; color: var(--green-dark); font-weight: 700; }
+  .weight-range-sub { font-size: 13px; color: var(--text-mid); margin-top: 4px; line-height: 1.55; }
+
+  /* photo insights */
+  .photo-insights {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .photo-insights-label {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    font-weight: 700; color: var(--text-label); margin-bottom: 8px;
+  }
+  .photo-insight-item {
+    font-size: 13px; color: var(--text-mid); padding: 5px 0;
+    border-top: 1px solid var(--border); line-height: 1.55;
+    display: flex; gap: 8px;
+  }
+  .photo-insight-item:first-of-type { border-top: none; padding-top: 0; }
+
+  /* AI guidance */
+  .ai-box {
+    background: var(--green-bg);
+    border: 1px solid var(--green-pale);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .ai-label {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    font-weight: 700; color: var(--green-dark); margin-bottom: 7px;
+  }
+  .ai-text { font-size: 13px; color: var(--text-mid); line-height: 1.7; }
+
+  /* health risks */
+  .risk-box {
+    background: var(--red-bg);
+    border: 1px solid var(--red-border);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .risk-title {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    font-weight: 700; color: var(--red); margin-bottom: 8px;
+  }
+  .risk-item {
+    font-size: 13px; color: #7A2020;
+    padding: 5px 0; border-top: 1px solid #F0C4C0;
+    line-height: 1.5;
+  }
+
+  /* recommendations */
+  .rec-title-label {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-label); font-weight: 700; margin-bottom: 8px;
+  }
+  .rec-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 9px 0; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--text-mid); line-height: 1.55;
+  }
+  .rec-dot { width: 5px; height: 5px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+
+  .vet-note {
+    font-size: 11px; color: var(--text-muted); line-height: 1.6;
+    font-style: italic; border-top: 1px solid var(--border);
+    padding-top: 1rem; margin-top: 1.25rem;
+  }
+
+  /* responsive */
+  @media (max-width: 480px) {
+    .card { padding: 1.5rem 1.25rem 2rem; }
+    .opt-grid { grid-template-columns: 1fr; }
+    .card-heading { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nobl-header">
+  <div class="nobl-logo">NOBL</div>
+  <div class="nobl-sub">Body Condition Score Assessor</div>
+</div>
+
+<div class="page-wrap">
+<div class="card">
+
+  <div class="progress-row" id="progress-row"></div>
+
+  <!-- ══════════════════════════════════════
+       STEP 0 — Dog profile
+  ══════════════════════════════════════ -->
+  <div class="step active" id="step-0">
+    <div class="card-heading">Assess your dog's body condition</div>
+    <div class="card-sub">Answer a few questions about what you see and feel. Upload photos so our AI can visually analyze your dog's physique and estimate how much weight they may need to gain or lose.</div>
+
+    <div class="field-group">
+      <label class="field-label">Dog's name</label>
+      <input class="text-input" id="dog-name" type="text" placeholder="e.g. Biscuit" />
+    </div>
+    <div class="field-group">
+      <label class="field-label">Current weight (optional — improves accuracy)</label>
+      <input class="text-input" id="dog-weight" type="text" placeholder="e.g. 42 lbs or 19 kg" />
+    </div>
+    <div class="field-group">
+      <label class="field-label">Age</label>
+      <div class="opt-grid">
+        <button class="opt" data-q="age" data-v="puppy">Puppy (under 1 yr)</button>
+        <button class="opt" data-q="age" data-v="young">Young adult (1–3 yrs)</button>
+        <button class="opt" data-q="age" data-v="adult">Adult (3–8 yrs)</button>
+        <button class="opt" data-q="age" data-v="senior">Senior (8+ yrs)</button>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Breed size</label>
+      <div class="opt-grid">
+        <button class="opt" data-q="size" data-v="toy">Toy / small (&lt;20 lb)</button>
+        <button class="opt" data-q="size" data-v="medium">Medium (20–50 lb)</button>
+        <button class="opt" data-q="size" data-v="large">Large (50–90 lb)</button>
+        <button class="opt" data-q="size" data-v="giant">Giant (90+ lb)</button>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Spayed / Neutered?</label>
+      <div class="opt-grid">
+        <button class="opt" data-q="altered" data-v="yes">Yes</button>
+        <button class="opt" data-q="altered" data-v="no">No</button>
+        <button class="opt" data-q="altered" data-v="unsure">Not sure</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep(1)">Start assessment →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 1 — Side photo + visual Q
+  ══════════════════════════════════════ -->
+  <div class="step" id="step-1">
+    <div class="step-badge">Visual assessment · 1 of 2</div>
+    <div class="card-heading">Side profile view</div>
+    <div class="card-sub">Upload a clear side-on photo — this is the most important image for AI analysis. Then answer the question below.</div>
+
+    <div class="field-group">
+      <label class="field-label">Side photo <span style="color:var(--red);font-weight:700;">★ recommended for AI analysis</span></label>
+      <label class="upload-zone" id="side-zone" for="side-upload">
+        <div class="upload-icon">📷</div>
+        <div class="upload-label">Upload side-view photo</div>
+        <div class="upload-hint">Stand your dog square on a flat surface, photograph from their level</div>
+        <img class="preview-img" id="side-preview" style="display:none;" alt="side photo preview" />
+        <div class="upload-badge" id="side-badge" style="display:none;">✓ Photo added — AI will analyze this</div>
+      </label>
+      <input type="file" id="side-upload" accept="image/*" onchange="previewImg('side-upload','side-preview','side-zone','side-badge')" />
+      <p class="upload-tip">Tip: natural light, dog standing still, photo taken at dog's eye level gives the best analysis.</p>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Belly silhouette from the side</label>
+      <div class="opt-grid">
+        <button class="opt" data-q="side_belly" data-v="1">Severely tucked — spine and hips very visible</button>
+        <button class="opt" data-q="side_belly" data-v="2">Very tucked — ribs visible without touching</button>
+        <button class="opt" data-q="side_belly" data-v="3">Noticeably tucked — waist clearly visible</button>
+        <button class="opt" data-q="side_belly" data-v="4">Slightly tucked — waist barely visible</button>
+        <button class="opt" data-q="side_belly" data-v="5">Gentle tuck — ideal silhouette</button>
+        <button class="opt" data-q="side_belly" data-v="6">No tuck — abdomen level or slightly rounded</button>
+        <button class="opt" data-q="side_belly" data-v="7">Abdomen rounded and slightly distended</button>
+        <button class="opt" data-q="side_belly" data-v="8">Abdomen significantly distended</button>
+        <button class="opt" data-q="side_belly" data-v="9">Abdomen extremely distended</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="goStep(0)">← Back</button>
+      <button class="btn btn-primary" onclick="goStep(2)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 2 — Top photo + visual Q
+  ══════════════════════════════════════ -->
+  <div class="step" id="step-2">
+    <div class="step-badge">Visual assessment · 2 of 2</div>
+    <div class="card-heading">Top-down view</div>
+    <div class="card-sub">Looking directly down at your dog from above — this reveals the waist shape clearly.</div>
+
+    <div class="field-group">
+      <label class="field-label">Top-down photo (optional)</label>
+      <label class="upload-zone" id="top-zone" for="top-upload">
+        <div class="upload-icon">📷</div>
+        <div class="upload-label">Upload top-down photo</div>
+        <div class="upload-hint">Stand above your dog and photograph straight down along their spine</div>
+        <img class="preview-img" id="top-preview" style="display:none;" alt="top photo preview" />
+        <div class="upload-badge" id="top-badge" style="display:none;">✓ Photo added — AI will analyze this</div>
+      </label>
+      <input type="file" id="top-upload" accept="image/*" onchange="previewImg('top-upload','top-preview','top-zone','top-badge')" />
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Waist shape from above</label>
+      <div class="opt-grid">
+        <button class="opt" data-q="top_waist" data-v="1">Extreme hourglass — spine and hips very prominent</button>
+        <button class="opt" data-q="top_waist" data-v="2">Pronounced hourglass — ribs visible from above</button>
+        <button class="opt" data-q="top_waist" data-v="3">Clear hourglass shape</button>
+        <button class="opt" data-q="top_waist" data-v="4">Mild hourglass — slight waist visible</button>
+        <button class="opt" data-q="top_waist" data-v="5">Gentle waist visible behind ribs</button>
+        <button class="opt" data-q="top_waist" data-v="6">Waist barely visible — body rectangular</button>
+        <button class="opt" data-q="top_waist" data-v="7">No waist — body oval-shaped</button>
+        <button class="opt" data-q="top_waist" data-v="8">No waist — very wide / barrel-shaped</button>
+        <button class="opt" data-q="top_waist" data-v="9">Extremely wide — fat on neck and limbs</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 3 — Rib palpation
+  ══════════════════════════════════════ -->
+  <div class="step" id="step-3">
+    <div class="step-badge">Hands-on assessment · 1 of 2</div>
+    <div class="card-heading">Feel the ribs</div>
+    <div class="card-sub">Place both hands on your dog's ribcage, thumbs along the spine, fingers spread over the sides. Press gently inward. What do you feel?</div>
+
+    <div class="field-group">
+      <label class="field-label">Rib palpation</label>
+      <div class="opt-grid">
+        <button class="opt" data-q="ribs" data-v="1">No fat at all — ribs sharp and painful to touch</button>
+        <button class="opt" data-q="ribs" data-v="2">No fat — ribs visible without pressing</button>
+        <button class="opt" data-q="ribs" data-v="3">Ribs easily felt with very little fat</button>
+        <button class="opt" data-q="ribs" data-v="4">Ribs easily felt with slight fat covering</button>
+        <button class="opt" data-q="ribs" data-v="5">Ribs felt easily — thin smooth covering</button>
+        <button class="opt" data-q="ribs" data-v="6">Ribs felt with slightly more pressure</button>
+        <button class="opt" data-q="ribs" data-v="7">Ribs require firm pressure through fat</button>
+        <button class="opt" data-q="ribs" data-v="8">Ribs very difficult to feel</button>
+        <button class="opt" data-q="ribs" data-v="9">Ribs impossible to feel — very thick fat</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-primary" onclick="goStep(4)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 4 — Spine & hips
+  ══════════════════════════════════════ -->
+  <div class="step" id="step-4">
+    <div class="step-badge">Hands-on assessment · 2 of 2</div>
+    <div class="card-heading">Feel the spine & hip bones</div>
+    <div class="card-sub">Run your fingers along the backbone, then feel the bony bumps (iliac wings) above the hips at the base of the tail.</div>
+
+    <div class="field-group">
+      <label class="field-label">Spine (backbone)</label>
+      <div class="opt-grid">
+        <button class="opt" data-q="spine" data-v="1">Sharp individual vertebrae — painful to touch</button>
+        <button class="opt" data-q="spine" data-v="2">Very prominent — clearly visible</button>
+        <button class="opt" data-q="spine" data-v="3">Prominent — easily felt</button>
+        <button class="opt" data-q="spine" data-v="4">Felt easily with slight covering</button>
+        <button class="opt" data-q="spine" data-v="5">Felt easily — smooth even covering</button>
+        <button class="opt" data-q="spine" data-v="6">Felt with mild pressure</button>
+        <button class="opt" data-q="spine" data-v="7">Difficult to feel through fat</button>
+        <button class="opt" data-q="spine" data-v="8">Hard to detect — thick fat</button>
+        <button class="opt" data-q="spine" data-v="9">Not detectable</button>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="field-group">
+      <label class="field-label">Hip bones</label>
+      <div class="opt-grid">
+        <button class="opt" data-q="hips" data-v="1">Sharp and painful — no coverage at all</button>
+        <button class="opt" data-q="hips" data-v="2">Very prominent — easily seen and felt</button>
+        <button class="opt" data-q="hips" data-v="3">Prominent — easily felt</button>
+        <button class="opt" data-q="hips" data-v="4">Felt easily with slight coverage</button>
+        <button class="opt" data-q="hips" data-v="5">Felt easily under thin muscle/fat layer</button>
+        <button class="opt" data-q="hips" data-v="6">Felt with light pressure</button>
+        <button class="opt" data-q="hips" data-v="7">Felt with firm pressure through fat</button>
+        <button class="opt" data-q="hips" data-v="8">Barely detectable</button>
+        <button class="opt" data-q="hips" data-v="9">Not detectable</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="goStep(3)">← Back</button>
+      <button class="btn btn-primary" onclick="runAnalysis()">Get BCS result →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 5 — Loading
+  ══════════════════════════════════════ -->
+  <div class="step" id="step-5">
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <div class="loading-msg" id="loading-msg">Analyzing your dog's body condition…</div>
+      <div class="loading-sub" id="loading-sub"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 6 — Results
+  ══════════════════════════════════════ -->
+  <div class="step" id="step-6">
+    <div id="result-content"></div>
+    <div class="btn-row" style="margin-top:1.5rem;">
+      <button class="btn" onclick="resetApp()">← Start over</button>
+    </div>
+    <p class="vet-note">This tool provides an educational estimate only and is not a substitute for professional veterinary evaluation. Weight estimates are approximations based on breed size norms and visual analysis — always consult your veterinarian for precise guidance.</p>
+  </div>
+
+</div><!-- .card -->
+</div><!-- .page-wrap -->
+
+<script>
+  // ─────────────────────────────────────────────────
+  // CONFIGURATION
+  // Replace this URL with your Netlify function URL
+  // after deployment, e.g.:
+  //   https://your-site.netlify.app/.netlify/functions/analyze
+  // ─────────────────────────────────────────────────
+  const API_ENDPOINT = "/.netlify/functions/analyze";
+
+  // ─────────────────────────────────────────────────
+  // State
+  // ─────────────────────────────────────────────────
+  let state = {};
+  let currentStep = 0;
+  let images = {}; // { 'side': base64string, 'top': base64string }
+
+  // ─────────────────────────────────────────────────
+  // Progress bar
+  // ─────────────────────────────────────────────────
+  function renderProgress(s) {
+    const row = document.getElementById('progress-row');
+    row.innerHTML = '';
+    for (let i = 0; i < 6; i++) {
+      const d = document.createElement('div');
+      d.className = 'prog-seg' + (i < s ? ' done' : '') + (i === s ? ' active' : '');
+      row.appendChild(d);
+    }
+  }
+
+  function goStep(n) {
+    document.getElementById('step-' + currentStep).classList.remove('active');
+    currentStep = n;
+    document.getElementById('step-' + currentStep).classList.add('active');
+    renderProgress(n);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ─────────────────────────────────────────────────
+  // Option buttons
+  // ─────────────────────────────────────────────────
+  document.querySelectorAll('.opt').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const q = this.dataset.q, v = this.dataset.v;
+      state[q] = v;
+      document.querySelectorAll(`.opt[data-q="${q}"]`).forEach(b => b.classList.remove('sel'));
+      this.classList.add('sel');
+    });
+  });
+
+  // ─────────────────────────────────────────────────
+  // Photo upload + preview + base64 capture
+  // ─────────────────────────────────────────────────
+  function previewImg(inputId, previewId, zoneId, badgeId) {
+    const file = document.getElementById(inputId).files[0];
+    if (!file) return;
+
+    const key = inputId === 'side-upload' ? 'side' : 'top';
+    const reader = new FileReader();
+    reader.onload = e => {
+      // Show preview
+      const img = document.getElementById(previewId);
+      img.src = e.target.result;
+      img.style.display = 'block';
+      document.getElementById(zoneId).classList.add('has-img');
+      document.getElementById(badgeId).style.display = 'inline-block';
+
+      // Store base64 (strip data URL prefix for API)
+      const b64 = e.target.result.split(',')[1];
+      images[key] = { data: b64, mediaType: file.type || 'image/jpeg' };
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ─────────────────────────────────────────────────
+  // BCS calculation from questionnaire
+  // ─────────────────────────────────────────────────
+  function calcBCS() {
+    const keys = ['side_belly', 'top_waist', 'ribs', 'spine', 'hips'];
+    const vals = keys.map(k => parseInt(state[k]) || 5);
+    return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+  }
+
+  // ─────────────────────────────────────────────────
+  // BCS metadata
+  // ─────────────────────────────────────────────────
+  const BCS_INFO = {
+    1: { label: 'Emaciated',      color: '#C0392B', bg: '#FAEAE8', tc: '#7A2020', desc: 'Severe muscle and fat loss. All bony prominences visible from a distance. No discernible body fat. Requires immediate veterinary attention.' },
+    2: { label: 'Very thin',      color: '#C0392B', bg: '#FAEAE8', tc: '#7A2020', desc: 'Very little muscle mass. All bony prominences visible. No palpable fat. Urgent veterinary evaluation recommended.' },
+    3: { label: 'Thin',           color: '#B0621A', bg: '#FAF0E6', tc: '#6B3A10', desc: 'Ribs easily palpable and may be visible. Tops of lumbar vertebrae visible. Pelvic bones becoming prominent.' },
+    4: { label: 'Underweight',    color: '#B0621A', bg: '#FAF0E6', tc: '#6B3A10', desc: 'Ribs easily palpable with minimal fat. Waist easily noted from above. Clear abdominal tuck visible from the side.' },
+    5: { label: 'Ideal',          color: '#2A7A5A', bg: '#E2F2EC', tc: '#1A5040', desc: 'Ribs palpable with a thin fat covering. Waist visible behind ribs from above. Abdomen gently tucked when viewed from the side.' },
+    6: { label: 'Overweight',     color: '#B0621A', bg: '#FAF0E6', tc: '#6B3A10', desc: 'Ribs palpable with slight excess fat. Waist discernible but not prominent. Abdominal tuck reduced.' },
+    7: { label: 'Heavy',          color: '#C0392B', bg: '#FAEAE8', tc: '#7A2020', desc: 'Ribs palpable with difficulty. Heavy fat deposits over lumbar area. Waist barely visible. Abdominal tuck may be absent.' },
+    8: { label: 'Obese',          color: '#A0281E', bg: '#FAEAE8', tc: '#6A1810', desc: 'Ribs not palpable under heavy fat cover. Fat deposits over lumbar area and tail base. No waist or abdominal tuck visible.' },
+    9: { label: 'Severely obese', color: '#801810', bg: '#FAEAE8', tc: '#500E08', desc: 'Massive fat deposits over thorax, spine and tail base. No waist or abdominal tuck. Fat deposits visible on neck and limbs.' }
+  };
+
+  const BAR_COLORS = { 1:'#C0392B',2:'#C0392B',3:'#B0621A',4:'#B0621A',5:'#2A7A5A',6:'#B0621A',7:'#C0392B',8:'#A0281E',9:'#801810' };
+
+  const RECS = {
+    1: ['Seek veterinary care immediately — this is a medical emergency', 'Gradual refeeding protocol under veterinary supervision is critical; rapid refeeding can cause refeeding syndrome', 'High-calorie, easily digestible food in 4–6 small meals per day', 'Monitor for refeeding syndrome: weakness, tremors, or breathing difficulty', 'Blood work to assess organ function and identify any underlying cause'],
+    2: ['Veterinary examination to rule out underlying illness is strongly advised', 'Increase daily caloric intake by 10–20% using a nutrient-dense food', 'Feed 3–4 small meals per day rather than 1–2 large ones', 'Track weight weekly; aim for gradual gain of 1–2% body weight per week', 'Consider calorie-dense toppers (cooked chicken, salmon) under vet guidance'],
+    3: ['Increase daily food portions by 10–15%', 'Feed a high-quality food appropriate for your dog\'s life stage', 'Weigh food portions with a kitchen scale for accuracy', 'Recheck weight every 2–3 weeks', 'Rule out parasites or metabolic conditions if weight stays low despite normal appetite'],
+    4: ['Increase daily ration by 5–10% and monitor over 2–3 weeks', 'Ensure food meets AAFCO standards for complete and balanced nutrition', 'Feed consistent measured portions — avoid free-feeding', 'Recheck body condition in 4 weeks'],
+    5: ['Ideal weight — maintain current feeding plan', 'Continue regular exercise appropriate for age and breed', 'Monitor BCS every 1–3 months, especially as activity levels shift', 'Schedule annual wellness exams to catch any changes early'],
+    6: ['Reduce daily food intake by 10% and reassess in 3–4 weeks', 'Measure food by weight (grams) for precision rather than volume', 'Eliminate table scraps; switch to low-calorie treats (carrot, cucumber)', 'Increase daily exercise by 10–15 minutes', 'Ensure all household members follow the same feeding plan'],
+    7: ['Reduce daily calories by 15–20% using a weight-management or light formula', 'Consult your vet to rule out hormonal causes (hypothyroidism, Cushing\'s disease)', 'Switch to a high-fiber, lower-calorie diet to help your dog feel full', 'Increase low-impact exercise (leash walks, swimming) daily', 'Account for all treats within the daily caloric budget — treats should be ≤10% of daily calories', 'Recheck weight and BCS monthly'],
+    8: ['Veterinary consultation strongly recommended before beginning a weight loss plan', 'A formal program with caloric targets set by your vet is essential', 'Prescription weight loss diets may be recommended (e.g., Hill\'s Metabolic, Royal Canin Satiety)', 'Target weight loss of no more than 1–2% body weight per week', 'Introduce low-impact exercise gradually — avoid strenuous activity initially', 'Monitor for joint pain, breathing difficulty, or exercise intolerance'],
+    9: ['Immediate veterinary evaluation is strongly advised', 'Structured caloric restriction under veterinary supervision — never fast the dog', 'Assess and manage obesity-related secondary conditions (joint disease, diabetes, hypertension)', 'Physical therapy or hydrotherapy may be beneficial for mobility', 'Weight loss of 0.5–1.5% body weight per week maximum under close monitoring', 'Monitor liver enzyme levels — rapid fat mobilization can cause hepatic lipidosis']
+  };
+
+  const HEALTH_RISKS = [
+    'Osteoarthritis — excess weight accelerates cartilage breakdown and joint inflammation',
+    'Type 2 diabetes mellitus — adipose tissue increases systemic insulin resistance',
+    'Cardiorespiratory disease — fat around chest impairs breathing and cardiac output',
+    'Hypertension — elevated cardiovascular workload from excess body mass',
+    'Reduced life expectancy — obese dogs live up to 2.5 years less than ideal-weight dogs',
+    'Increased anesthetic and surgical risk — fat distribution complicates intubation and drug dosing',
+    'Higher cancer risk — obesity is linked to mammary tumors and transitional cell carcinoma',
+    'Heat intolerance — insulating fat makes overweight dogs prone to heat-related illness',
+    'Urinary disorders — increased bladder pressure and altered urinary tract anatomy',
+    'Immune dysfunction — adipose tissue releases pro-inflammatory cytokines, impairing immune response'
+  ];
+
+  // ─────────────────────────────────────────────────
+  // Build the AI prompt payload (with or without images)
+  // ─────────────────────────────────────────────────
+  function buildMessages(name, weight, bcs, info) {
+    const age     = state.age     || 'unknown';
+    const size    = state.size    || 'unknown';
+    const altered = state.altered === 'yes' ? 'spayed/neutered' : state.altered === 'no' ? 'intact' : 'unknown reproductive status';
+    const weightStr = weight ? `, current weight: ${weight}` : '';
+
+    const systemPrompt = `You are a veterinary nutrition and body condition expert. You help dog owners understand their dog's body condition score (BCS) and provide practical guidance. Always be warm, encouraging, and precise. When photos are provided, describe specific visual indicators you observe. Always provide a plausible weight loss or gain range in both pounds and kilograms.`;
+
+    const photoSection = Object.keys(images).length > 0
+      ? `\nPhotos have been uploaded (${Object.keys(images).join(' and ')} view) and are included in this message.`
+      : '\nNo photos were uploaded — base your visual estimate on the questionnaire responses only.';
+
+    const textPrompt = `Dog profile: "${name}", ${age} age, ${size} breed size, ${altered}${weightStr}.
+
+Questionnaire findings:
+- Side belly appearance: ${state.side_belly || 5}/9
+- Top-down waist shape: ${state.top_waist || 5}/9  
+- Rib palpation: ${state.ribs || 5}/9
+- Spine palpation: ${state.spine || 5}/9
+- Hip bone palpation: ${state.hips || 5}/9
+- Calculated BCS: ${bcs}/9 (${info.label})
+${photoSection}
+
+Please respond with a JSON object (no markdown fences) with exactly these keys:
+{
+  "photoInsights": ["observation 1", "observation 2", "observation 3"],
+  "weightRange": "X–Y lbs (A–B kg)",
+  "weightRangeDirection": "lose" | "gain" | "maintain",
+  "weightRationale": "2 sentence explanation of the estimate",
+  "personalizedGuidance": "3–4 warm, practical sentences tailored to this dog's age, size, and BCS",
+  "timelineEstimate": "Realistic timeline statement e.g. 'With consistent effort, reaching ideal BCS may take 3–5 months'"
+}
+
+For photoInsights: if photos provided, give 3 specific visual observations. If no photos, give 3 observations based on questionnaire answers — prefix each with 'Based on your description: '.
+For weightRange: if BCS is 5 (ideal), set to "0 lbs (0 kg)". Otherwise give a realistic range based on breed size norms. If current weight was provided, use it for precision.`;
+
+    // Build content array — add images if present
+    const contentParts = [];
+
+    if (images.side) {
+      contentParts.push({
+        type: 'image',
+        source: { type: 'base64', media_type: images.side.mediaType, data: images.side.data }
+      });
+    }
+    if (images.top) {
+      contentParts.push({
+        type: 'image',
+        source: { type: 'base64', media_type: images.top.mediaType, data: images.top.data }
+      });
+    }
+    contentParts.push({ type: 'text', text: textPrompt });
+
+    return {
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: contentParts }]
+    };
+  }
+
+  // ─────────────────────────────────────────────────
+  // Main analysis function
+  // ─────────────────────────────────────────────────
+  async function runAnalysis() {
+    goStep(5);
+
+    const msgs = [
+      'Analyzing your dog\'s body condition…',
+      images.side || images.top ? 'Examining uploaded photos with AI vision…' : 'Reviewing your questionnaire responses…',
+      'Estimating healthy weight range…',
+      'Personalizing your recommendations…'
+    ];
+    let mi = 0;
+    const sub = document.getElementById('loading-sub');
+    if (images.side || images.top) {
+      sub.textContent = 'AI is analyzing your photos — this may take a moment';
+    }
+    const iv = setInterval(() => {
+      mi = (mi + 1) % msgs.length;
+      document.getElementById('loading-msg').textContent = msgs[mi];
+    }, 1800);
+
+    const bcs      = calcBCS();
+    const info     = BCS_INFO[bcs];
+    const name     = document.getElementById('dog-name').value.trim() || 'Your dog';
+    const weight   = document.getElementById('dog-weight').value.trim();
+    const payload  = buildMessages(name, weight, bcs, info);
+
+    let aiData = null;
+    try {
+      const resp = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const raw = await resp.json();
+      const text = (raw.content || []).map(c => c.text || '').join('');
+      const clean = text.replace(/```json|```/g, '').trim();
+      aiData = JSON.parse(clean);
+    } catch (e) {
+      console.error('AI analysis error:', e);
+    }
+
+    clearInterval(iv);
+    renderResults(bcs, info, name, aiData);
+    goStep(6);
+  }
+
+  // ─────────────────────────────────────────────────
+  // Render results
+  // ─────────────────────────────────────────────────
+  function renderResults(bcs, info, name, ai) {
+    const dev = bcs - 5;
+    const statusText = dev === 0
+      ? 'Ideal weight'
+      : dev < 0
+        ? `${Math.abs(dev)} point${Math.abs(dev) > 1 ? 's' : ''} below ideal`
+        : `${dev} point${dev > 1 ? 's' : ''} above ideal`;
+
+    const recs = RECS[bcs] || RECS[5];
+    let html = '';
+
+    // ── BCS banner ──
+    html += `<div class="result-banner" style="background:${info.bg};border:1px solid ${info.color}40;">
+      <div class="bcs-number" style="color:${info.color};">${bcs}<span class="bcs-denom">/9</span></div>
+      <div class="bcs-label-text" style="color:${info.tc};">${info.label}</div>
+      <div class="bcs-status" style="color:${info.tc};">${statusText}</div>
+      <div class="bcs-desc-text" style="color:${info.tc};">${info.desc}</div>
+    </div>`;
+
+    // ── BCS scale bar ──
+    html += `<div class="bcs-bar">`;
+    for (let i = 1; i <= 9; i++) {
+      html += `<div class="bcs-seg${i === bcs ? ' cur' : ''}" style="background:${BAR_COLORS[i]};"></div>`;
+    }
+    html += `</div>
+    <div class="bar-labels"><span>1 · emaciated</span><span>5 · ideal</span><span>9 · obese</span></div>`;
+
+    // ── Weight range callout (from AI) ──
+    if (ai && ai.weightRange) {
+      const dirLabel = ai.weightRangeDirection === 'maintain'
+        ? 'Currently at ideal weight'
+        : ai.weightRangeDirection === 'lose'
+          ? `Estimated weight to lose`
+          : `Estimated weight to gain`;
+      const dirColor = ai.weightRangeDirection === 'maintain'
+        ? '#2A7A5A'
+        : ai.weightRangeDirection === 'lose'
+          ? '#B0621A'
+          : '#2A7A5A';
+
+      html += `<div class="weight-callout" style="border-left-color:${dirColor};">
+        <div class="weight-callout-label" style="color:${dirColor};">${dirLabel}</div>
+        <div class="weight-range" style="color:${dirColor};">${ai.weightRange}</div>
+        <div class="weight-range-sub">${ai.weightRationale || ''}</div>
+        ${ai.timelineEstimate ? `<div style="margin-top:8px;font-size:12px;color:var(--text-muted);font-style:italic;">${ai.timelineEstimate}</div>` : ''}
+      </div>`;
+    }
+
+    // ── Photo / visual insights ──
+    if (ai && ai.photoInsights && ai.photoInsights.length) {
+      const hasPhotos = Object.keys(images).length > 0;
+      html += `<div class="photo-insights">
+        <div class="photo-insights-label">${hasPhotos ? 'AI photo analysis' : 'Visual assessment findings'}</div>`;
+      ai.photoInsights.forEach(obs => {
+        html += `<div class="photo-insight-item"><span style="color:var(--green-dark);font-weight:700;flex-shrink:0;">→</span><span>${obs}</span></div>`;
+      });
+      html += `</div>`;
+    }
+
+    // ── Health risks (BCS 7–9) ──
+    if (bcs >= 7) {
+      html += `<div class="risk-box">
+        <div class="risk-title">Long-term health risks · BCS ${bcs}</div>
+        ${HEALTH_RISKS.map(r => `<div class="risk-item">· ${r}</div>`).join('')}
+      </div>`;
+    }
+
+    // ── AI personalized guidance ──
+    if (ai && ai.personalizedGuidance) {
+      html += `<div class="ai-box">
+        <div class="ai-label">Personalized guidance for ${name}</div>
+        <div class="ai-text">${ai.personalizedGuidance}</div>
+      </div>`;
+    }
+
+    // ── Recommendations ──
+    html += `<div style="margin-top:1rem;">
+      <div class="rec-title-label">Recommended steps</div>`;
+    recs.forEach(r => {
+      html += `<div class="rec-item">
+        <div class="rec-dot" style="background:${info.color};"></div>
+        <div>${r}</div>
+      </div>`;
+    });
+    html += `</div>`;
+
+    document.getElementById('result-content').innerHTML = html;
+  }
+
+  // ─────────────────────────────────────────────────
+  // Reset
+  // ─────────────────────────────────────────────────
+  function resetApp() {
+    state = {};
+    images = {};
+    document.querySelectorAll('.opt').forEach(b => b.classList.remove('sel'));
+    document.getElementById('dog-name').value = '';
+    document.getElementById('dog-weight').value = '';
+    ['side-preview','top-preview'].forEach(id => {
+      const el = document.getElementById(id);
+      el.src = '';
+      el.style.display = 'none';
+    });
+    ['side-zone','top-zone'].forEach(id => document.getElementById(id).classList.remove('has-img'));
+    ['side-badge','top-badge'].forEach(id => document.getElementById(id).style.display = 'none');
+    document.getElementById('loading-sub').textContent = '';
+    goStep(0);
+  }
+
+  // Init
+  renderProgress(0);
+</script>
+
+</body>
+</html>
