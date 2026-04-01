@@ -205,7 +205,7 @@ input[type="file"] { display: none; }
   </div>
 </div>
 
-<!-- ?????????? ASSESSMENT VIEW ?????????? -->
+<!-- ASSESSMENT VIEW -->
 <div class="view active" id="view-assess">
 <div class="page-wrap">
 <div class="card">
@@ -253,7 +253,7 @@ input[type="file"] { display: none; }
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="goStep(1)">Start assessment ?</button>
+      <button class="btn btn-primary" onclick="goStep(1)">Start assessment</button>
     </div>
   </div>
 
@@ -265,21 +265,21 @@ input[type="file"] { display: none; }
 
     <div class="photo-guide">
       <div class="photo-guide-title">Photo tips for best results</div>
-      <div class="photo-tip"><span class="tip-icon">?</span><span><strong>Distance:</strong> Stand 4-8 feet away -- close enough to see the full body, far enough to capture the whole dog</span></div>
-      <div class="photo-tip"><span class="tip-icon">??</span><span><strong>Lighting:</strong> Natural daylight is ideal. Avoid flash -- it flattens body shape. Avoid backlighting (dog in front of a window)</span></div>
-      <div class="photo-tip"><span class="tip-icon">?</span><span><strong>Angle:</strong> Camera at your dog's shoulder height, perfectly side-on so you can see the full belly line</span></div>
-      <div class="photo-tip"><span class="tip-icon">?</span><span><strong>Position:</strong> Dog standing naturally on a flat surface, all four feet on the ground</span></div>
-      <div class="photo-tip"><span class="tip-icon">?</span><span><strong>Don't stress:</strong> An imperfect photo is still analyzed -- just answer the questionnaire below to help fill any gaps</span></div>
+      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Distance:</strong> Stand 4-8 feet away -- close enough to see the full body, far enough to capture the whole dog</span></div>
+      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Lighting:</strong> Natural daylight is ideal. Avoid flash -- it flattens body shape. Avoid backlighting (dog in front of a window)</span></div>
+      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Angle:</strong> Camera at your dog's shoulder height, perfectly side-on so you can see the full belly line</span></div>
+      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Position:</strong> Dog standing naturally on a flat surface, all four feet on the ground</span></div>
+      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Don't stress:</strong> An imperfect photo is still analyzed -- just answer the questionnaire below to help fill any gaps</span></div>
     </div>
 
     <div class="field-group">
-      <label class="field-label">Side photo <span style="color:var(--red);font-weight:700;">? recommended</span></label>
+      <label class="field-label">Side photo <span style="color:var(--red);font-weight:700;">(recommended)</span></label>
       <label class="upload-zone" id="side-zone" for="side-upload">
-        <div class="upload-icon">?</div>
+        <div class="upload-icon" style="font-size:22px">&#128247;</div>
         <div class="upload-label">Tap to upload side-view photo</div>
         <div class="upload-hint">JPG, PNG, HEIC accepted * any file size</div>
         <img class="preview-img" id="side-preview" style="display:none;" alt="side preview" />
-        <div class="upload-badge" id="side-badge">? Photo uploaded -- AI will analyze this</div>
+        <div class="upload-badge" id="side-badge">Photo uploaded - AI will analyze this</div>
       </label>
       <input type="file" id="side-upload" accept="image/*" onchange="previewImg('side-upload','side-preview','side-zone','side-badge','side-warn')" />
       <div class="photo-warn-box" id="side-warn"></div>
@@ -300,8 +300,8 @@ input[type="file"] { display: none; }
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn" onclick="goStep(0)">? Back</button>
-      <button class="btn btn-primary" onclick="goStep(2)">Next ?</button>
+      <button class="btn" onclick="goStep(0)">Back</button>
+      <button class="btn btn-primary" onclick="goStep(2)">Next</button>
     </div>
   </div>
 
@@ -313,20 +313,20 @@ input[type="file"] { display: none; }
 
     <div class="photo-guide">
       <div class="photo-guide-title">Top-down photo tips</div>
-      <div class="photo-tip"><span class="tip-icon">??</span><span><strong>Position yourself:</strong> Stand directly above your dog, camera pointing straight down along their spine</span></div>
-      <div class="photo-tip"><span class="tip-icon">?</span><span><strong>Distance:</strong> High enough to capture the full body from nose to tail</span></div>
-      <div class="photo-tip"><span class="tip-icon">??</span><span><strong>No flash:</strong> Flash from above casts harsh shadows that distort body shape -- use natural light</span></div>
-      <div class="photo-tip"><span class="tip-icon">?</span><span><strong>Optional:</strong> Skip this if your dog won't stay still -- the side photo and questionnaire are sufficient</span></div>
+      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Position yourself:</strong> Stand directly above your dog, camera pointing straight down along their spine</span></div>
+      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Distance:</strong> High enough to capture the full body from nose to tail</span></div>
+      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>No flash:</strong> Flash from above casts harsh shadows that distort body shape -- use natural light</span></div>
+      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Optional:</strong> Skip this if your dog won't stay still -- the side photo and questionnaire are sufficient</span></div>
     </div>
 
     <div class="field-group">
       <label class="field-label">Top-down photo (optional)</label>
       <label class="upload-zone" id="top-zone" for="top-upload">
-        <div class="upload-icon">?</div>
+        <div class="upload-icon" style="font-size:22px">&#128247;</div>
         <div class="upload-label">Tap to upload top-down photo</div>
         <div class="upload-hint">JPG, PNG, HEIC accepted</div>
         <img class="preview-img" id="top-preview" style="display:none;" alt="top preview" />
-        <div class="upload-badge" id="top-badge">? Photo uploaded -- AI will analyze this</div>
+        <div class="upload-badge" id="top-badge">Photo uploaded - AI will analyze this</div>
       </label>
       <input type="file" id="top-upload" accept="image/*" onchange="previewImg('top-upload','top-preview','top-zone','top-badge','top-warn')" />
       <div class="photo-warn-box" id="top-warn"></div>
@@ -347,8 +347,8 @@ input[type="file"] { display: none; }
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn" onclick="goStep(1)">? Back</button>
-      <button class="btn btn-primary" onclick="goStep(3)">Next ?</button>
+      <button class="btn" onclick="goStep(1)">Back</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Next</button>
     </div>
   </div>
 
@@ -372,8 +372,8 @@ input[type="file"] { display: none; }
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn" onclick="goStep(2)">? Back</button>
-      <button class="btn btn-primary" onclick="goStep(4)">Next ?</button>
+      <button class="btn" onclick="goStep(2)">Back</button>
+      <button class="btn btn-primary" onclick="goStep(4)">Next</button>
     </div>
   </div>
 
@@ -412,8 +412,8 @@ input[type="file"] { display: none; }
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn" onclick="goStep(3)">? Back</button>
-      <button class="btn btn-primary" onclick="runAnalysis()">Get BCS result ?</button>
+      <button class="btn" onclick="goStep(3)">Back</button>
+      <button class="btn btn-primary" onclick="runAnalysis()">Get BCS result</button>
     </div>
   </div>
 
@@ -430,8 +430,8 @@ input[type="file"] { display: none; }
   <div class="step" id="step-6">
     <div id="result-content"></div>
     <div class="btn-row no-print" style="margin-top:1.5rem;">
-      <button class="btn" onclick="resetApp()">? New assessment</button>
-      <button class="btn btn-primary" onclick="printReport()">? Download / Print report</button>
+      <button class="btn" onclick="resetApp()">New assessment</button>
+      <button class="btn btn-primary" onclick="printReport()">Download / Print report</button>
     </div>
     <p class="vet-note">This tool provides an educational estimate only and is not a substitute for professional veterinary evaluation. Weight estimates are approximations -- always consult your veterinarian for precise guidance.</p>
   </div>
@@ -440,7 +440,7 @@ input[type="file"] { display: none; }
 </div><!-- .page-wrap -->
 </div><!-- #view-assess -->
 
-<!-- ?????????? HISTORY VIEW ?????????? -->
+<!-- HISTORY VIEW -->
 <div class="view" id="view-history">
 <div class="page-wrap">
 <div class="card">
@@ -455,7 +455,7 @@ input[type="file"] { display: none; }
 </div>
 </div>
 
-<!-- ?????????? PRINT REPORT TEMPLATE ?????????? -->
+<!-- PRINT REPORT TEMPLATE -->
 <div id="print-area" style="display:none;"></div>
 
 <script>
@@ -549,7 +549,7 @@ function selectBreed(value, label) {
   document.getElementById('breed-search').value = label;
   document.getElementById('breed-dropdown').style.display = 'none';
   const sel = document.getElementById('breed-selected');
-  sel.textContent = '? ' + label;
+  sel.textContent = 'Selected: ' + label;
   sel.style.display = 'block';
   onBreedChange();
 }
@@ -558,7 +558,7 @@ function onBreedChange() {
   const breed = document.getElementById('dog-breed').value;
   const noteEl = document.getElementById('breed-note');
   if (BREED_NOTES[breed]) {
-    noteEl.textContent = '? ' + BREED_NOTES[breed].note;
+    noteEl.textContent = BREED_NOTES[breed].note;
     noteEl.classList.add('visible');
   } else {
     noteEl.classList.remove('visible');
@@ -654,7 +654,7 @@ function previewImg(inputId, previewId, zoneId, badgeId, warnId) {
         warns.push('Image resolution appears low. If possible, try a higher-resolution photo for best AI analysis.');
       }
       if (warns.length > 0) {
-        warnEl.textContent = '? Tip: ' + warns.join(' ') + ' Your photo has been accepted and will be analyzed.';
+        warnEl.textContent = 'Tip: ' + warns.join(' ') + ' Your photo has been accepted and will be analyzed.';
         warnEl.classList.add('visible');
         zone.classList.add('photo-warn');
       } else {
@@ -849,12 +849,14 @@ function renderResults(bcs, info, name, ai, breedName) {
 
   // Weight callout
   if (ai?.weightRange) {
-    const dirColor = ai.weightRangeDirection==='maintain'?'#2A7A5A':ai.weightRangeDirection==='lose'?'#B0621A':'#2A7A5A';
-    const dirLabel = ai.weightRangeDirection==='maintain'?'Currently at ideal weight':ai.weightRangeDirection==='lose'?'Estimated weight to lose':'Estimated weight to gain';
+    const dirColor = '#2A7A5A';
+    const dirLabel = 'Ideal weight range for ' + name;
+    const subNote = ai.weightRangeDirection==='lose' ? 'To reach this range, your dog needs to lose some weight. See recommended steps below.' : ai.weightRangeDirection==='gain' ? 'To reach this range, your dog needs to gain some weight. See recommended steps below.' : 'Great news - your dog is already within the ideal weight range!';
     html += `<div class="weight-callout" style="border-left-color:${dirColor};">
       <div class="weight-callout-label" style="color:${dirColor};">${dirLabel}</div>
       <div class="weight-range" style="color:${dirColor};">${ai.weightRange}</div>
       <div class="weight-range-sub">${ai.weightRationale||''}</div>
+      <div style="font-size:12px;color:#3D5C54;margin-top:6px;font-style:italic;">${subNote}</div>
       ${ai.timelineEstimate?`<div style="margin-top:8px;font-size:12px;color:var(--text-muted);font-style:italic;">${ai.timelineEstimate}</div>`:''}
     </div>`;
   }
@@ -862,7 +864,7 @@ function renderResults(bcs, info, name, ai, breedName) {
   // Photo insights
   if (ai?.photoInsights?.length) {
     html += `<div class="photo-insights"><div class="photo-insights-label">${Object.keys(images).length>0?'AI photo analysis':'Visual assessment findings'}</div>`;
-    ai.photoInsights.forEach(obs => { html += `<div class="photo-insight-item"><span style="color:var(--green-dark);font-weight:700;flex-shrink:0;">?</span><span>${obs}</span></div>`; });
+    ai.photoInsights.forEach(obs => { html += `<div class="photo-insight-item"><span style="width:6px;height:6px;background:#2D5147;border-radius:50%;display:inline-block;margin-top:5px;flex-shrink:0;"></span><span>${obs}</span></div>`; });
     html += `</div>`;
   }
 
@@ -926,7 +928,7 @@ function renderHistory() {
   const el = document.getElementById('history-content');
   if (!history.length) {
     el.innerHTML = `<div class="history-empty">
-      <div class="history-empty-icon">?</div>
+      <div class="history-empty-icon" style="font-size:32px">&#128062;</div>
       <div class="history-empty-text">No assessments saved yet.<br>Complete your first assessment to start tracking progress.</div>
     </div>`;
     return;
@@ -961,8 +963,8 @@ function renderHistory() {
           <div class="history-label" style="color:${info.color};">${info.label}${h.weight ? ' * ' + h.weight : ''}</div>
         </div>
         <div class="history-actions">
-          <button class="btn btn-sm" onclick="viewHistoryEntry(${h.id})" title="View report">?</button>
-          <button class="btn btn-sm" style="color:var(--red);border-color:var(--red-border);" onclick="deleteHistoryEntry(${h.id})" title="Delete">?</button>
+          <button class="btn btn-sm" onclick="viewHistoryEntry(${h.id})" title="View report">View</button>
+          <button class="btn btn-sm" style="color:var(--red);border-color:var(--red-border);" onclick="deleteHistoryEntry(${h.id})" title="Delete">Delete</button>
         </div>
       </div>`;
     });
@@ -1052,7 +1054,7 @@ function printReport() {
       </div>` : '';
 
   const insightsHtml = ai.photoInsights?.length
-    ? ai.photoInsights.map(obs => `<div style="font-size:12px;color:#3D5C54;padding:4px 0;border-top:1px solid #C5D8D2;line-height:1.4;display:flex;gap:8px;"><span style="color:#2D5147;font-weight:700;">?</span><span>${obs}</span></div>`).join('')
+    ? ai.photoInsights.map(obs => `<div style="font-size:12px;color:#3D5C54;padding:4px 0;border-top:1px solid #C5D8D2;line-height:1.4;display:flex;gap:8px;"><span style="width:6px;height:6px;background:#2D5147;border-radius:50%;display:inline-block;margin-top:4px;flex-shrink:0;"></span><span>${obs}</span></div>`).join('')
     : '';
 
   // BCS scale bar HTML for print
@@ -1174,7 +1176,7 @@ function printReport() {
 
     <!-- Timeline -->
     ${ai.timelineEstimate ? `<div style="font-size:12px;color:#3D5C54;font-style:italic;margin-bottom:16px;padding:10px 14px;background:#E6EFEC;border-radius:4px;">
-      ? ${ai.timelineEstimate}
+      Timeline: ${ai.timelineEstimate}
     </div>` : ''}
 
     <!-- Signature lines -->
