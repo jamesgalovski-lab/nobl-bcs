@@ -67,7 +67,7 @@ body { font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--page-
 .text-input { width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; font-size: 14px; color: var(--text-dark); background: #fff; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
 .text-input:focus { border-color: var(--green-mid); box-shadow: 0 0 0 2px rgba(61,107,94,0.14); }
 .text-input::placeholder { color: #B5CECA; }
-select.text-input { cursor: pointer; }
+select.text-input { cursor: pointer; display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 44px !important; -webkit-appearance: menulist !important; appearance: menulist !important; }
 
 /* ── Option buttons ── */
 .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -222,7 +222,7 @@ input[type="file"] { display: none; }
     </div>
     <div class="field-group">
       <label class="field-label">Breed</label>
-      <select class="text-input" id="dog-breed" onchange="onBreedChange()">
+      <select class="text-input" id="dog-breed" onchange="onBreedChange()" style="display:block!important;width:100%!important;min-height:44px!important;visibility:visible!important;opacity:1!important;-webkit-appearance:menulist!important;appearance:menulist!important;">
         <option value="">Select breed...</option>
         <optgroup label="Toy & Small Breeds">
           <option value="chihuahua">Chihuahua</option>
