@@ -721,7 +721,8 @@ const HEALTH_RISKS = [
 // -------------------------------------------------------------
 // AI PROMPT BUILDER
 // -------------------------------------------------------------
-function buildMessages(name, weight, bcs, info, breedName) {
+function buildMessages(name, weight, bcs, info, breedName, resizedImages) {
+  resizedImages = resizedImages || images;
   const age = state.age || 'unknown';
   const size = state.size || 'unknown';
   const altered = state.altered === 'yes' ? 'spayed/neutered' : state.altered === 'no' ? 'intact' : 'unknown reproductive status';
@@ -762,11 +763,46 @@ Rules:
 - vetSummary: write as if authoring a clinical note. Include BCS, key physical findings, and primary recommendation.`;
 
   const content = [];
-  if (images.side) content.push({ type: 'image', source: { type: 'base64', media_type: images.side.mediaType, data: images.side.data }});
-  if (images.top)  content.push({ type: 'image', source: { type: 'base64', media_type: images.top.mediaType,  data: images.top.data  }});
+  if (resizedImages.side) content.push({ type: 'image', source: { type: 'base64', media_type: resizedImages.side.mediaType, data: resizedImages.side.data }});
+  if (resizedImages.top)  content.push({ type: 'image', source: { type: 'base64', media_type: resizedImages.top.mediaType,  data: resizedImages.top.data  }});
   content.push({ type: 'text', text: textPrompt });
 
   return { model: 'claude-sonnet-4-20250514', max_tokens: 1200, system: systemPrompt, messages: [{ role: 'user', content }] };
+}
+
+// -------------------------------------------------------------
+// IMAGE RESIZER -- keeps payload under Netlify 6MB limit
+// -------------------------------------------------------------
+async function resizeImagesForUpload(imgs) {
+  const MAX_DIM = 1024;
+  const QUALITY = 0.82;
+  const out = {};
+  for (const key of Object.keys(imgs)) {
+    const img = imgs[key];
+    try {
+      const resized = await new Promise((resolve) => {
+        const image = new Image();
+        image.onload = () => {
+          let w = image.width, h = image.height;
+          if (w > MAX_DIM || h > MAX_DIM) {
+            if (w > h) { h = Math.round(h * MAX_DIM / w); w = MAX_DIM; }
+            else       { w = Math.round(w * MAX_DIM / h); h = MAX_DIM; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(image, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', QUALITY);
+          resolve({ data: dataUrl.split(',')[1], mediaType: 'image/jpeg' });
+        };
+        image.onerror = () => resolve(img);
+        image.src = 'data:' + img.mediaType + ';base64,' + img.data;
+      });
+      out[key] = resized;
+    } catch(e) {
+      out[key] = img;
+    }
+  }
+  return out;
 }
 
 // -------------------------------------------------------------
@@ -793,14 +829,30 @@ async function runAnalysis() {
 
   let aiData = null;
   try {
+    // Resize images before sending to avoid payload size limits
+    const resizedImages = await resizeImagesForUpload(images);
+    const payload = buildMessages(name, weight, bcs, info, breedName, resizedImages);
+
     const resp = await fetch(API_ENDPOINT, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(buildMessages(name, weight, bcs, info, breedName))
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
+
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error('API error ' + resp.status + ': ' + errText.slice(0, 200));
+    }
+
     const raw  = await resp.json();
+    if (raw.error) throw new Error(raw.error.message || JSON.stringify(raw.error));
     const text = (raw.content || []).map(c => c.text || '').join('');
-    aiData = JSON.parse(text.replace(/```json|```/g, '').trim());
-  } catch(e) { console.error('AI error:', e); }
+    const cleaned = text.replace(/```json|```/g, '').trim();
+    aiData = JSON.parse(cleaned);
+  } catch(e) {
+    console.error('AI error:', e);
+    document.getElementById('loading-msg').textContent = 'Analysis complete (AI unavailable: ' + e.message.slice(0,80) + ')';
+  }
 
   clearInterval(iv);
 
