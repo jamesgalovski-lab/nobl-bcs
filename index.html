@@ -17,8 +17,8 @@
   --card-bg:     #FFFFFF;
   --text-dark:   #1C3530;
   --text-mid:    #3D5C54;
-  --text-muted:  #7A9990;
-  --text-label:  #4A7A6D;
+  --text-muted:  #4A6B62;
+  --text-label:  #2D5A4E;
   --border:      #C5D8D2;
   --red:         #C0392B;
   --red-bg:      #FAEAE8;
@@ -57,7 +57,7 @@ body { font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--page-
 .prog-seg.active { background: var(--green-light); }
 
 /* -- Typography -- */
-.step-badge { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+.step-badge { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #2D5147; margin-bottom: 6px; }
 .card-heading { font-family: Georgia, serif; font-size: 24px; color: var(--text-dark); font-weight: 700; line-height: 1.3; margin-bottom: 8px; }
 .card-sub { font-size: 14px; color: var(--text-mid); line-height: 1.65; margin-bottom: 1.5rem; }
 .field-label { display: block; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-label); font-weight: 600; margin-bottom: 7px; }
@@ -82,7 +82,7 @@ select.text-input { cursor: pointer; display: block !important; visibility: visi
 .upload-zone.photo-warn { border-color: var(--amber); background: var(--amber-bg); }
 .upload-icon { font-size: 22px; margin-bottom: 6px; }
 .upload-label { font-size: 13px; color: var(--text-label); font-weight: 600; margin-bottom: 3px; }
-.upload-hint { font-size: 12px; color: var(--text-muted); }
+.upload-hint { font-size: 12px; color: #3D5C54; }
 .upload-badge { display: none; margin-top: 8px; background: var(--green-bg); color: var(--green-dark); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; padding: 3px 10px; border-radius: 20px; }
 .preview-img { width: 100%; max-height: 200px; object-fit: contain; border-radius: 4px; margin-top: 10px; }
 input[type="file"] { display: none; }
@@ -90,7 +90,7 @@ input[type="file"] { display: none; }
 /* Photo guidance tips */
 .photo-guide { background: var(--green-bg); border: 1px solid var(--green-pale); border-radius: 4px; padding: 12px 14px; margin-bottom: 12px; }
 .photo-guide-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: var(--green-dark); margin-bottom: 8px; }
-.photo-tip { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--text-mid); margin-bottom: 5px; line-height: 1.4; }
+.photo-tip { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: #1C3530; margin-bottom: 5px; line-height: 1.4; }
 .photo-tip:last-child { margin-bottom: 0; }
 .tip-icon { flex-shrink: 0; font-size: 13px; }
 .photo-warn-box { background: var(--amber-bg); border: 1px solid #E8C898; border-radius: 4px; padding: 10px 14px; margin-top: 8px; font-size: 12px; color: var(--amber); line-height: 1.5; display: none; }
@@ -109,7 +109,7 @@ input[type="file"] { display: none; }
 
 /* -- Results enhanced -- */
 .results-section { margin-bottom: 1.25rem; }
-.section-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-label); font-weight: 700; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1.5px solid var(--border); }
+.section-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #1C3530; font-weight: 700; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1.5px solid var(--border); }
 .bcs-hero { display: flex; align-items: flex-start; gap: 1.5rem; background: var(--card-bg); border-radius: 6px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
 .bcs-hero-score { flex-shrink: 0; text-align: center; }
 .bcs-hero-detail { flex: 1; }
@@ -123,7 +123,7 @@ input[type="file"] { display: none; }
 .rec-cat-walk  { background: #E6F1F8; color: #1A5C8A; }
 .rec-cat-watch { background: #F5F0FB; color: #6B3FA0; }
 .rec-cat-vet   { background: #FDF0F0; color: #A0281E; }
-.rec-card { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; background: #fff; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 6px; font-size: 13px; color: var(--text-mid); line-height: 1.55; }
+.rec-card { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; background: #fff; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 6px; font-size: 13px; color: #1C3530; line-height: 1.55; }
 .rec-card-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
 
 /* Vet disclaimer box */
@@ -138,19 +138,19 @@ input[type="file"] { display: none; }
 .compare-col { text-align: center; padding: 12px; border-radius: 4px; }
 .compare-col.dog-col { background: var(--green-bg); }
 .compare-col.human-col { background: #EEF4FB; }
-.compare-icon { font-size: 36px; margin-bottom: 6px; }
-.compare-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: var(--text-label); margin-bottom: 4px; }
+.compare-icon { margin-bottom: 8px; display: flex; justify-content: center; align-items: flex-end; height: 52px; }
+.compare-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: #1C3530; margin-bottom: 4px; }
 .compare-weight { font-family: Georgia, serif; font-size: 22px; font-weight: 700; margin-bottom: 2px; }
-.compare-sub { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+.compare-sub { font-size: 11px; color: #2D5147; line-height: 1.4; }
 .compare-insight { margin-top: 12px; padding: 10px 12px; border-radius: 4px; font-size: 12px; line-height: 1.6; }
 
 /* -- Walk calorie estimator -- */
 .walk-estimator { background: #EEF4FB; border: 1px solid #B8D4EC; border-radius: 6px; padding: 1.25rem; margin-bottom: 1rem; }
-.walk-header { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: #1A5C8A; margin-bottom: 4px; }
-.walk-sub { font-size: 12px; color: #2C5F7A; margin-bottom: 14px; line-height: 1.5; }
+.walk-header { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: #0D3347; margin-bottom: 4px; }
+.walk-sub { font-size: 12px; color: #143D52; margin-bottom: 14px; line-height: 1.5; }
 .walk-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
 .walk-control { }
-.walk-ctrl-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; color: #1A5C8A; margin-bottom: 5px; display: block; }
+.walk-ctrl-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; color: #0D3347; margin-bottom: 5px; display: block; }
 .walk-input { width: 100%; padding: 8px 12px; border: 1px solid #B8D4EC; border-radius: 4px; font-family: inherit; font-size: 13px; color: var(--text-dark); background: #fff; outline: none; }
 .walk-input:focus { border-color: #1A5C8A; box-shadow: 0 0 0 2px rgba(26,92,138,0.12); }
 .walk-pace-btns { display: flex; gap: 6px; }
@@ -160,11 +160,11 @@ input[type="file"] { display: none; }
 .walk-result { background: #fff; border-radius: 4px; padding: 12px 14px; text-align: center; border: 1px solid #B8D4EC; }
 .walk-calories { font-family: Georgia, serif; font-size: 32px; font-weight: 700; color: #1A5C8A; }
 .walk-cal-label { font-size: 11px; color: #2C5F7A; margin-top: 2px; }
-.walk-context { font-size: 11px; color: var(--text-muted); margin-top: 8px; font-style: italic; line-height: 1.5; }
+.walk-context { font-size: 11px; color: #2C5F7A; margin-top: 8px; font-style: italic; line-height: 1.5; }
 .walk-weekly { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px; }
 .walk-week-item { background: #EEF4FB; border-radius: 4px; padding: 8px 6px; text-align: center; }
 .walk-week-num { font-family: Georgia, serif; font-size: 16px; font-weight: 700; color: #1A5C8A; }
-.walk-week-lbl { font-size: 10px; color: #2C5F7A; margin-top: 2px; }
+.walk-week-lbl { font-size: 10px; color: #143D52; margin-top: 2px; }
 
 /* -- Loading -- */
 .loading-wrap { text-align: center; padding: 3.5rem 1rem; }
@@ -184,28 +184,28 @@ input[type="file"] { display: none; }
 .bcs-bar { display: flex; gap: 3px; margin: 1.1rem 0 3px; }
 .bcs-seg { flex: 1; height: 7px; border-radius: 3px; opacity: 0.18; transition: all 0.3s; }
 .bcs-seg.cur { opacity: 1; transform: scaleY(1.7); }
-.bar-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 1.25rem; }
+.bar-labels { display: flex; justify-content: space-between; font-size: 10px; color: #3D5C54; letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 1.25rem; }
 
 .weight-callout { background: var(--green-bg); border: 1px solid var(--green-pale); border-left: 4px solid var(--green-dark); border-radius: 4px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
 .weight-callout-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: var(--green-dark); margin-bottom: 6px; }
 .weight-range { font-family: Georgia, serif; font-size: 28px; color: var(--green-dark); font-weight: 700; }
-.weight-range-sub { font-size: 13px; color: var(--text-mid); margin-top: 4px; line-height: 1.55; }
+.weight-range-sub { font-size: 13px; color: #1C3530; margin-top: 4px; line-height: 1.55; }
 
 .photo-insights { background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
 .photo-insights-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: var(--text-label); margin-bottom: 8px; }
-.photo-insight-item { font-size: 13px; color: var(--text-mid); padding: 6px 0; border-top: 1px solid var(--border); line-height: 1.55; display: flex; gap: 8px; }
+.photo-insight-item { font-size: 13px; color: #1C3530; padding: 6px 0; border-top: 1px solid var(--border); line-height: 1.55; display: flex; gap: 8px; }
 .photo-insight-item:first-of-type { border-top: none; padding-top: 0; }
 
 .ai-box { background: var(--green-bg); border: 1px solid var(--green-pale); border-radius: 4px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
 .ai-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: var(--green-dark); margin-bottom: 7px; }
-.ai-text { font-size: 13px; color: var(--text-mid); line-height: 1.7; }
+.ai-text { font-size: 13px; color: #1C3530; line-height: 1.7; }
 
 .risk-box { background: var(--red-bg); border: 1px solid var(--red-border); border-radius: 4px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
 .risk-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: var(--red); margin-bottom: 8px; }
 .risk-item { font-size: 13px; color: #7A2020; padding: 5px 0; border-top: 1px solid #F0C4C0; line-height: 1.5; }
 
 .rec-title-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-label); font-weight: 700; margin-bottom: 8px; }
-.rec-item { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-mid); line-height: 1.55; }
+.rec-item { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-top: 1px solid var(--border); font-size: 13px; color: #1C3530; line-height: 1.55; }
 .rec-dot { width: 5px; height: 5px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
 
 .vet-note { font-size: 11px; color: var(--text-muted); line-height: 1.6; font-style: italic; border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1.25rem; }
@@ -272,8 +272,8 @@ input[type="file"] { display: none; }
 
   <!-- STEP 0 -- Profile -->
   <div class="step active" id="step-0">
-    <div class="card-heading">Assess your dog's body condition</div>
-    <div class="card-sub">Fill in your dog's details below. The more information you provide, the more accurate the assessment and weight estimates will be.</div>
+    <div class="card-heading">Let's check in on your dog's health</div>
+    <div class="card-sub">Answer a few questions about what you see and feel -- and upload a photo if you have one handy. We'll give you an honest, practical assessment and tell you exactly what to do next.</div>
 
     <div class="field-group">
       <label class="field-label">Dog's name</label>
@@ -311,6 +311,18 @@ input[type="file"] { display: none; }
         <button class="opt" data-q="altered" data-v="unsure">Not sure</button>
       </div>
     </div>
+    <div class="field-group">
+      <label class="field-label">Sex</label>
+      <div class="opt-grid">
+        <button class="opt" data-q="sex" data-v="male">Male</button>
+        <button class="opt" data-q="sex" data-v="female">Female</button>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Your email -- optional</label>
+      <input class="text-input" id="owner-email" type="email" placeholder="you@example.com" />
+      <div style="font-size:11px;color:#2D5A4E;margin-top:5px;line-height:1.5;">We'll use this to send you your results and occasional tips on keeping your dog healthy. No spam, ever.</div>
+    </div>
     <div class="btn-row">
       <button class="btn btn-primary" onclick="goStep(1)">Start assessment</button>
     </div>
@@ -319,8 +331,8 @@ input[type="file"] { display: none; }
   <!-- STEP 1 -- Side photo -->
   <div class="step" id="step-1">
     <div class="step-badge">Visual assessment * 1 of 2</div>
-    <div class="card-heading">Side profile photo</div>
-    <div class="card-sub">A good side photo is the most valuable input for AI analysis. Follow the tips below -- but don't worry if it's not perfect, the AI will work with what you have.</div>
+    <div class="card-heading">Snap a side photo if you can</div>
+    <div class="card-sub">A clear side shot gives our AI the most to work with -- but honestly, even an imperfect phone photo is better than nothing. Don't let the tips below stress you out; just do your best.</div>
 
     <div class="photo-guide">
       <div class="photo-guide-title">Photo tips for best results</div>
@@ -328,7 +340,7 @@ input[type="file"] { display: none; }
       <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Lighting:</strong> Natural daylight is ideal. Avoid flash -- it flattens body shape. Avoid backlighting (dog in front of a window)</span></div>
       <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Angle:</strong> Camera at your dog's shoulder height, perfectly side-on so you can see the full belly line</span></div>
       <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Position:</strong> Dog standing naturally on a flat surface, all four feet on the ground</span></div>
-      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Don't stress:</strong> An imperfect photo is still analyzed -- just answer the questionnaire below to help fill any gaps</span></div>
+      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Relax:</strong> Whatever you have works. The questions below help fill in what the photo can't show us.</span></div>
     </div>
 
     <div class="field-group">
@@ -375,7 +387,7 @@ input[type="file"] { display: none; }
       <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Position yourself:</strong> Stand directly above your dog, camera pointing straight down along their spine</span></div>
       <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Distance:</strong> High enough to capture the full body from nose to tail</span></div>
       <div class="photo-tip"><span class="tip-icon">-</span><span><strong>No flash:</strong> Flash from above casts harsh shadows that distort body shape -- use natural light</span></div>
-      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Optional:</strong> Skip this if your dog won't stay still -- the side photo and questionnaire are sufficient</span></div>
+      <div class="photo-tip"><span class="tip-icon">-</span><span><strong>Skip it if needed:</strong> If your dog is being uncooperative, no worries -- the side photo and your answers below are plenty.</span></div>
     </div>
 
     <div class="field-group">
@@ -414,8 +426,8 @@ input[type="file"] { display: none; }
   <!-- STEP 3 -- Ribs -->
   <div class="step" id="step-3">
     <div class="step-badge">Hands-on assessment * 1 of 2</div>
-    <div class="card-heading">Feel the ribs</div>
-    <div class="card-sub">Place both hands on your dog's ribcage, thumbs along the spine, fingers spread over the sides. Press gently inward. What do you feel?</div>
+    <div class="card-heading">Time to use your hands</div>
+    <div class="card-sub">Place both hands on your dog's ribcage -- thumbs along the spine, fingers spread over the sides. Press in gently. This is one of the most reliable things a vet checks, and you can do it right now.</div>
     <div class="field-group">
       <label class="field-label">Rib palpation</label>
       <div class="opt-grid">
@@ -492,7 +504,7 @@ input[type="file"] { display: none; }
       <button class="btn" onclick="resetApp()">New assessment</button>
       <button class="btn btn-primary" onclick="printReport()">Download / Print report</button>
     </div>
-    <p class="vet-note">This tool provides an educational estimate only and is not a substitute for professional veterinary evaluation. Weight estimates are approximations -- always consult your veterinarian for precise guidance.</p>
+    <p class="vet-note">This tool gives you a solid starting point -- not a clinical diagnosis. Think of it as a well-informed friend helping you understand what your vet would look for. Always follow up with your veterinarian before making significant changes to your dog's diet or exercise routine.</p>
   </div>
 
 </div><!-- .card -->
@@ -811,8 +823,12 @@ function getHumanEquivalent(dogWeightLbs, bcs, breedKey) {
   const breed = BREED_IDEAL[breedKey];
   if (!breed) return null;
 
-  // Ideal dog weight midpoint
-  const idealMid = (breed.min + breed.max) / 2;
+  // Adjust ideal range by sex -- females typically 10-15% lighter at top end
+  const sex = state.sex || 'unknown';
+  const sexAdj = sex === 'female' ? 0.88 : sex === 'male' ? 1.0 : 0.94;
+  const adjustedMax = Math.round(breed.max * sexAdj);
+  const adjustedMin = Math.round(breed.min * (sexAdj + 0.06));
+  const idealMid = (adjustedMin + adjustedMax) / 2;
 
   // Estimate current body fat % based on BCS
   // BCS 5 = ~20% body fat, each point +/- ~10%
@@ -963,15 +979,16 @@ function buildMessages(name, weight, bcs, info, breedName, resizedImages) {
   const age = state.age || 'unknown';
   const size = state.size || 'unknown';
   const altered = state.altered === 'yes' ? 'spayed/neutered' : state.altered === 'no' ? 'intact' : 'unknown reproductive status';
+  const sex = state.sex ? state.sex : 'unknown sex';
   const weightStr = weight ? `, current weight: ${weight}` : '';
   const breedStr = breedName ? `, breed: ${breedName}` : '';
   const hasPhotos = Object.keys(images).length > 0;
   const breedAdj = getBreedAdjustment();
   const breedAdjNote = breedAdj !== 0 ? `\nNote: BCS has been adjusted by ${breedAdj > 0 ? '+' : ''}${breedAdj} points for breed-specific norms (${breedName}).` : '';
 
-  const systemPrompt = `You are a veterinary nutrition and body condition expert. You help dog owners understand their dog's BCS and provide practical, breed-aware guidance. Always be warm, encouraging, and precise. When photos are provided, describe specific visual indicators you observe -- be descriptive even if photo quality is imperfect, do not refuse to analyze. Always provide a plausible weight loss or gain range.`;
+  const systemPrompt = `You are a knowledgeable, caring friend who happens to have deep expertise in veterinary nutrition and canine health. You talk to dog owners the way a trusted vet friend would over coffee -- honest, practical, and warm, never clinical or preachy. You give real answers, not hedged disclaimers. When photos are provided, describe specific visual observations in plain language -- be direct even if photo quality is imperfect, never refuse to assess. Always provide a realistic weight range estimate and a clear, actionable next step. Use 'your dog' and the dog's name naturally. Avoid jargon. Never say 'as an AI' or 'I recommend consulting a vet' as your primary advice.`;
 
-  const textPrompt = `Dog profile: "${name}", ${age} age${breedStr}, ${altered}${weightStr}.
+  const textPrompt = `Dog profile: "${name}", ${sex}, ${age} age${breedStr}, ${altered}${weightStr}.
 
 Questionnaire findings:
 - Side belly appearance: ${state.side_belly||5}/9
@@ -996,8 +1013,8 @@ Respond with a JSON object (no markdown, no code fences) with exactly these keys
 Rules:
 - photoInsights: if photos provided give 3 specific visual observations from the images, even if quality is imperfect -- describe what you can see. If no photos, prefix each with 'Based on owner description: '
 - weightRange: if BCS 5 use "0 lbs (0 kg)". Otherwise give a realistic range based on breed and size norms. Use current weight if provided.
-- personalizedGuidance: mention breed-specific considerations if relevant. Keep under 90 words.
-- vetSummary: write as if authoring a clinical note. Include BCS, key physical findings, and primary recommendation.`;
+- personalizedGuidance: write as a knowledgeable, caring friend. Be direct and warm. Mention the dog by name. Include a breed-specific insight if relevant. Give one clear, specific next step. Keep under 90 words. Do not start with 'I' or 'As'.
+- vetSummary: write as a brief clinical note for the vet report PDF. Include BCS score, key physical findings from the assessment, estimated weight status, and primary recommendation. Professional and objective tone only for this field.`;
 
   const content = [];
   if (resizedImages.side) content.push({ type: 'image', source: { type: 'base64', media_type: resizedImages.side.mediaType, data: resizedImages.side.data }});
@@ -1049,12 +1066,12 @@ async function runAnalysis() {
   goStep(5);
   const hasPhotos = Object.keys(images).length > 0;
   const msgs = [
-    'Analyzing your dog\'s body condition...',
-    hasPhotos ? 'Examining uploaded photos with AI vision...' : 'Reviewing your assessment answers...',
-    'Estimating healthy weight range...',
-    'Personalizing your recommendations...'
+    'Taking a good look at everything you shared...',
+    hasPhotos ? 'Studying those photos carefully...' : 'Working through your answers...',
+    'Figuring out what a healthy weight looks like for this dog...',
+    'Putting together your personalized game plan...'
   ];
-  if (hasPhotos) document.getElementById('loading-sub').textContent = 'AI is analyzing your photos -- this may take a moment';
+  if (hasPhotos) document.getElementById('loading-sub').textContent = 'Giving the photos a careful look -- hang tight for just a moment.';
   let mi = 0;
   const iv = setInterval(() => { mi=(mi+1)%msgs.length; document.getElementById('loading-msg').textContent=msgs[mi]; }, 1800);
 
@@ -1094,6 +1111,8 @@ async function runAnalysis() {
   clearInterval(iv);
 
   // Store result for history + printing
+  const ownerEmail = document.getElementById('owner-email') ? document.getElementById('owner-email').value.trim() : '';
+
   lastResult = {
     id: Date.now(),
     date: new Date().toISOString(),
@@ -1101,7 +1120,9 @@ async function runAnalysis() {
     breed: breedName,
     weight,
     age: state.age,
+    sex: state.sex,
     altered: state.altered,
+    email: ownerEmail,
     bcs,
     state: { ...state },
     aiData,
@@ -1134,7 +1155,7 @@ function renderResults(bcs, info, name, ai, breedName, breedKey, weight) {
 
   // --- SECTION 1: BCS Score ---
   html += '<div class="results-section">';
-  html += '<div class="section-label">Body Condition Score</div>';
+  html += '<div class="section-label">Here is ' + name + '\'s Body Condition Score</div>';
   html += `<div class="result-banner" style="background:${info.bg};border:1px solid ${info.color}40;display:flex;align-items:flex-start;gap:1.5rem;">
     <div style="flex-shrink:0;text-align:center;">
       <div class="bcs-number" style="color:${info.color};">${bcs}<span class="bcs-denom">/9</span></div>
@@ -1161,7 +1182,7 @@ function renderResults(bcs, info, name, ai, breedName, breedKey, weight) {
       ? 'Your dog is currently underweight. The range above is the healthy target to work toward.'
       : 'Great news -- your dog is already within their ideal weight range. Focus on maintaining this.';
     html += '<div class="results-section">';
-    html += '<div class="section-label">Ideal Weight Range for '+name+'</div>';
+    html += '<div class="section-label">What a healthy weight looks like for '+name+'</div>';
     html += `<div class="weight-callout" style="border-left-color:${dirColor};">
       <div style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:${dirColor};">${ai.weightRange}</div>
       <div style="font-size:13px;color:#3D5C54;margin-top:6px;line-height:1.55;">${ai.weightRationale||''}</div>
@@ -1185,7 +1206,7 @@ function renderResults(bcs, info, name, ai, breedName, breedKey, weight) {
   // --- SECTION 4: Personalized Guidance ---
   if (ai && ai.personalizedGuidance) {
     html += '<div class="results-section">';
-    html += '<div class="section-label">Personalized Guidance</div>';
+    html += '<div class="section-label">What we suggest for '+name+'</div>';
     html += '<div class="ai-box" style="margin-bottom:0;"><div class="ai-text">'+ai.personalizedGuidance+'</div></div>';
     html += '</div>';
   }
@@ -1193,7 +1214,7 @@ function renderResults(bcs, info, name, ai, breedName, breedKey, weight) {
   // --- SECTION 5: Health Risks (BCS 7+) ---
   if (bcs >= 7) {
     html += '<div class="results-section">';
-    html += '<div class="section-label">Long-Term Health Risks at BCS '+bcs+'</div>';
+    html += '<div class="section-label">Why this matters -- health risks at BCS '+bcs+'</div>';
     html += '<div class="risk-box" style="margin-bottom:0;">';
     HEALTH_RISKS.forEach(r => { html += '<div class="risk-item">&middot; '+r+'</div>'; });
     html += '</div></div>';
@@ -1202,7 +1223,7 @@ function renderResults(bcs, info, name, ai, breedName, breedKey, weight) {
   // --- SECTION 6: Recommended Actions (grouped by category) ---
   const recs = RECS[bcs] || RECS[5];
   html += '<div class="results-section">';
-  html += '<div class="section-label">Recommended Action Plan</div>';
+  html += '<div class="section-label">Your action plan</div>';
 
   // Group by category
   const grouped = {};
@@ -1259,13 +1280,13 @@ function renderResults(bcs, info, name, ai, breedName, breedKey, weight) {
       }
 
       html += '<div class="results-section">';
-      html += '<div class="section-label">Weight in Perspective: ' + breedName + ' vs. Human</div>';
+      html += '<div class="section-label">What ' + name + '\'s weight looks like in human terms</div>';
       html += '<div class="breed-compare">';
       html += '<div class="compare-grid">';
 
       // Dog column
       html += '<div class="compare-col dog-col">';
-      html += '<div class="compare-icon">&#128054;</div>';
+      html += '<div class="compare-icon"><svg width="56" height="44" viewBox="0 0 56 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 38 Q8 30 14 28 L18 26 Q20 18 28 16 Q32 15 36 17 Q42 15 46 18 L50 20 Q52 24 50 28 L48 32 Q46 38 42 40 L18 40 Q10 40 8 38Z" fill="#2D5147" opacity="0.75"/><circle cx="46" cy="17" r="5" fill="#2D5147" opacity="0.75"/><path d="M46 12 Q50 8 52 10 Q51 13 48 14" fill="#2D5147" opacity="0.75"/><path d="M18 40 L16 44" stroke="#2D5147" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/><path d="M24 40 L23 44" stroke="#2D5147" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/><path d="M34 40 L33 44" stroke="#2D5147" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/><path d="M40 40 L39 44" stroke="#2D5147" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/><path d="M50 28 Q56 30 54 34 Q52 36 50 32" fill="#2D5147" opacity="0.75"/></svg></div>';
       html += '<div class="compare-label">' + (breedName || 'Dog') + '</div>';
       html += '<div class="compare-weight" style="color:' + info.color + ';">' + (currentWeightLbs ? Math.round(currentWeightLbs) + ' lbs' : Math.round(breedData.min) + '-' + Math.round(breedData.max) + ' lbs') + '</div>';
       html += '<div class="compare-sub">BCS ' + bcs + ' / 9<br>Ideal: ' + breedData.min + '-' + breedData.max + ' lbs</div>';
@@ -1275,7 +1296,8 @@ function renderResults(bcs, info, name, ai, breedName, breedKey, weight) {
       const humanBgColor = bcs > 5 ? '#FDF0E8' : bcs < 5 ? '#EEF4FB' : '#E2F2EC';
       const humanTextColor = bcs > 5 ? '#B0621A' : bcs < 5 ? '#1A5C8A' : '#2A7A5A';
       html += '<div class="compare-col human-col" style="background:' + humanBgColor + '">';
-      html += '<div class="compare-icon">&#128100;</div>';
+      var humanSVG = bcs > 5 ? '<svg width="34" height="52" viewBox="0 0 34 52" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="17" cy="6" r="5.5" fill="#B0621A" opacity="0.8"/><path d="M6 18 Q7 12 17 12 Q27 12 28 18 L32 32 L26 33 L24 44 L10 44 L8 33 L2 32 Z" fill="#B0621A" opacity="0.8"/><path d="M28 18 L33 25 L30 28 L26 22" fill="#B0621A" opacity="0.8"/><path d="M6 18 L1 25 L4 28 L8 22" fill="#B0621A" opacity="0.8"/><path d="M10 44 L9 52 L13 52 L14 46 L20 46 L21 52 L25 52 L24 44Z" fill="#B0621A" opacity="0.8"/></svg>' : bcs < 5 ? '<svg width="24" height="52" viewBox="0 0 24 52" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="6" r="4.5" fill="#1A5C8A" opacity="0.8"/><path d="M5 18 Q6 12 12 12 Q18 12 19 18 L20 32 L17 32 L16 44 L8 44 L7 32 L4 32 Z" fill="#1A5C8A" opacity="0.8"/><path d="M19 18 L23 25 L21 27 L18 22" fill="#1A5C8A" opacity="0.8"/><path d="M5 18 L1 25 L3 27 L6 22" fill="#1A5C8A" opacity="0.8"/><path d="M8 44 L7 52 L10 52 L11 46 L13 46 L14 52 L17 52 L16 44Z" fill="#1A5C8A" opacity="0.8"/></svg>' : '<svg width="28" height="52" viewBox="0 0 28 52" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="6" r="5.5" fill="#1A5C8A" opacity="0.8"/><path d="M6 18 Q7 12 14 12 Q21 12 22 18 L24 32 L20 32 L18 44 L10 44 L8 32 L4 32 Z" fill="#1A5C8A" opacity="0.8"/><path d="M22 18 L27 26 L24 28 L20 22" fill="#1A5C8A" opacity="0.8"/><path d="M6 18 L1 26 L4 28 L8 22" fill="#1A5C8A" opacity="0.8"/><path d="M10 44 L9 52 L12 52 L13 46 L15 46 L16 52 L19 52 L18 44Z" fill="#1A5C8A" opacity="0.8"/></svg>';
+      html += '<div class="compare-icon">' + humanSVG + '</div>';
       html += '<div class="compare-label">Human equivalent</div>';
       html += '<div class="compare-weight" style="color:' + humanTextColor + ';">' + humanEq.humanWeightLbs + ' lbs</div>';
       html += '<div class="compare-sub">' + humanEq.heightFt + '\'' + humanEq.heightInRem + '" tall<br>Healthy: ' + humanEq.healthyLow + '-' + humanEq.healthyHigh + ' lbs</div>';
@@ -1294,10 +1316,10 @@ function renderResults(bcs, info, name, ai, breedName, breedKey, weight) {
     const safeWeight = (defaultWeight && defaultWeight > 0) ? defaultWeight : 50;
 
     html += '<div class="results-section">';
-    html += '<div class="section-label">Walk Calorie Estimator</div>';
+    html += '<div class="section-label">How much does a walk actually help?</div>';
     html += '<div class="walk-estimator">';
-    html += '<div class="walk-header">How many calories does a walk burn?</div>';
-    html += '<div class="walk-sub">Walking is one of the safest and most effective ways to help ' + name + ' lose weight. Use this tool to estimate calories burned per walk and track your weekly progress.</div>';
+    html += '<div class="walk-header">Walks add up faster than you think</div>';
+    html += '<div class="walk-sub">Walking is honestly one of the best things you can do for ' + name + ' right now -- low-stress on the joints, easy to fit into a routine, and the results are real. See what a daily walk is actually worth.</div>';
 
     html += '<div class="walk-controls">';
     html += '<div class="walk-control">';
@@ -1696,6 +1718,7 @@ function resetApp() {
   lastResult = null;
   document.querySelectorAll('.opt').forEach(b => b.classList.remove('sel'));
   document.getElementById('dog-name').value = '';
+  if (document.getElementById('owner-email')) document.getElementById('owner-email').value = '';
   document.getElementById('dog-weight').value = '';
   document.getElementById('dog-breed').value = '';
   document.getElementById('breed-search').value = '';
