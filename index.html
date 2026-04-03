@@ -131,6 +131,41 @@ input[type="file"] { display: none; }
 .vet-disclaimer-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: var(--amber); margin-bottom: 6px; }
 .vet-disclaimer-text { font-size: 12px; color: #6B4A10; line-height: 1.6; }
 
+/* -- Breed comparison card -- */
+.breed-compare { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem; margin-bottom: 1rem; overflow: hidden; }
+.breed-compare-header { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--text-label); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1.5px solid var(--border); }
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.compare-col { text-align: center; padding: 12px; border-radius: 4px; }
+.compare-col.dog-col { background: var(--green-bg); }
+.compare-col.human-col { background: #EEF4FB; }
+.compare-icon { font-size: 36px; margin-bottom: 6px; }
+.compare-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: var(--text-label); margin-bottom: 4px; }
+.compare-weight { font-family: Georgia, serif; font-size: 22px; font-weight: 700; margin-bottom: 2px; }
+.compare-sub { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+.compare-insight { margin-top: 12px; padding: 10px 12px; border-radius: 4px; font-size: 12px; line-height: 1.6; }
+
+/* -- Walk calorie estimator -- */
+.walk-estimator { background: #EEF4FB; border: 1px solid #B8D4EC; border-radius: 6px; padding: 1.25rem; margin-bottom: 1rem; }
+.walk-header { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: #1A5C8A; margin-bottom: 4px; }
+.walk-sub { font-size: 12px; color: #2C5F7A; margin-bottom: 14px; line-height: 1.5; }
+.walk-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.walk-control { }
+.walk-ctrl-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; color: #1A5C8A; margin-bottom: 5px; display: block; }
+.walk-input { width: 100%; padding: 8px 12px; border: 1px solid #B8D4EC; border-radius: 4px; font-family: inherit; font-size: 13px; color: var(--text-dark); background: #fff; outline: none; }
+.walk-input:focus { border-color: #1A5C8A; box-shadow: 0 0 0 2px rgba(26,92,138,0.12); }
+.walk-pace-btns { display: flex; gap: 6px; }
+.walk-pace-btn { flex: 1; padding: 7px 6px; border: 1px solid #B8D4EC; border-radius: 4px; font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer; background: #fff; color: #2C5F7A; transition: all 0.15s; text-align: center; }
+.walk-pace-btn:hover { background: #D0E8F6; }
+.walk-pace-btn.on { background: #1A5C8A; border-color: #1A5C8A; color: #fff; }
+.walk-result { background: #fff; border-radius: 4px; padding: 12px 14px; text-align: center; border: 1px solid #B8D4EC; }
+.walk-calories { font-family: Georgia, serif; font-size: 32px; font-weight: 700; color: #1A5C8A; }
+.walk-cal-label { font-size: 11px; color: #2C5F7A; margin-top: 2px; }
+.walk-context { font-size: 11px; color: var(--text-muted); margin-top: 8px; font-style: italic; line-height: 1.5; }
+.walk-weekly { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px; }
+.walk-week-item { background: #EEF4FB; border-radius: 4px; padding: 8px 6px; text-align: center; }
+.walk-week-num { font-family: Georgia, serif; font-size: 16px; font-weight: 700; color: #1A5C8A; }
+.walk-week-lbl { font-size: 10px; color: #2C5F7A; margin-top: 2px; }
+
 /* -- Loading -- */
 .loading-wrap { text-align: center; padding: 3.5rem 1rem; }
 .spinner { width: 30px; height: 30px; border: 2.5px solid var(--green-pale); border-top-color: var(--green-dark); border-radius: 50%; animation: spin 0.75s linear infinite; margin: 0 auto 1rem; }
@@ -594,6 +629,10 @@ function getBreedAdjustment() {
   return BREED_NOTES[breed] ? BREED_NOTES[breed].adjust : 0;
 }
 
+function getBreedKey() {
+  return document.getElementById('dog-breed').value || '';
+}
+
 function getBreedName() {
   const breed = document.getElementById('dog-breed').value;
   const found = ALL_BREEDS.find(b => b.v === breed);
@@ -699,6 +738,123 @@ function calcBCS() {
   const raw = vals.reduce((a, b) => a + b, 0) / vals.length;
   const adj = getBreedAdjustment();
   return Math.min(9, Math.max(1, Math.round(raw + adj)));
+}
+
+// -------------------------------------------------------------
+// BREED IDEAL WEIGHT DATA (AKC / FCI published standards, lbs)
+// Used for human comparison and weight context
+// -------------------------------------------------------------
+const BREED_IDEAL = {
+  chihuahua:              {min:2,  max:6,   human_height:62},
+  yorkshire_terrier:      {min:4,  max:7,   human_height:63},
+  maltese:                {min:4,  max:7,   human_height:62},
+  pomeranian:             {min:3,  max:7,   human_height:62},
+  shih_tzu:               {min:9,  max:16,  human_height:63},
+  miniature_dachshund:    {min:8,  max:11,  human_height:63},
+  toy_poodle:             {min:4,  max:6,   human_height:62},
+  miniature_pinscher:     {min:8,  max:10,  human_height:63},
+  papillon:               {min:5,  max:10,  human_height:63},
+  italian_greyhound:      {min:7,  max:14,  human_height:64},
+  beagle:                 {min:18, max:30,  human_height:65},
+  french_bulldog:         {min:16, max:28,  human_height:65},
+  cavalier_king_charles:  {min:12, max:18,  human_height:64},
+  cocker_spaniel:         {min:20, max:30,  human_height:65},
+  miniature_schnauzer:    {min:11, max:20,  human_height:64},
+  west_highland_terrier:  {min:15, max:22,  human_height:64},
+  pug:                    {min:14, max:18,  human_height:64},
+  boston_terrier:         {min:12, max:25,  human_height:65},
+  basenji:                {min:22, max:24,  human_height:65},
+  corgi:                  {min:25, max:38,  human_height:65},
+  border_collie:          {min:30, max:55,  human_height:66},
+  australian_shepherd:    {min:40, max:65,  human_height:66},
+  english_springer_spaniel:{min:40,max:50,  human_height:66},
+  standard_poodle:        {min:40, max:70,  human_height:67},
+  whippet:                {min:25, max:40,  human_height:66},
+  american_staffordshire: {min:40, max:70,  human_height:66},
+  siberian_husky:         {min:35, max:60,  human_height:66},
+  dalmatian:              {min:45, max:70,  human_height:67},
+  brittany:               {min:30, max:40,  human_height:65},
+  vizsla:                 {min:44, max:60,  human_height:67},
+  labrador:               {min:55, max:80,  human_height:67},
+  golden_retriever:       {min:55, max:75,  human_height:67},
+  german_shepherd:        {min:50, max:90,  human_height:68},
+  rottweiler:             {min:80, max:135, human_height:68},
+  doberman:               {min:60, max:100, human_height:68},
+  weimaraner:             {min:55, max:90,  human_height:68},
+  belgian_malinois:       {min:40, max:80,  human_height:67},
+  boxer:                  {min:50, max:80,  human_height:68},
+  standard_dachshund:     {min:16, max:32,  human_height:65},
+  irish_setter:           {min:60, max:70,  human_height:68},
+  great_dane:             {min:110,max:175, human_height:70},
+  saint_bernard:          {min:120,max:180, human_height:70},
+  newfoundland:           {min:100,max:150, human_height:70},
+  bernese_mountain_dog:   {min:70, max:115, human_height:69},
+  great_pyrenees:         {min:85, max:115, human_height:69},
+  mastiff:                {min:120,max:230, human_height:70},
+  irish_wolfhound:        {min:105,max:180, human_height:71},
+  leonberger:             {min:90, max:170, human_height:70},
+  greyhound:              {min:57, max:88,  human_height:68},
+  whippet_sight:          {min:25, max:40,  human_height:66},
+  saluki:                 {min:35, max:65,  human_height:67},
+  borzoi:                 {min:55, max:105, human_height:69},
+  azawakh:                {min:33, max:55,  human_height:67},
+  mixed_small:            {min:10, max:25,  human_height:64},
+  mixed_medium:           {min:25, max:55,  human_height:66},
+  mixed_large:            {min:55, max:90,  human_height:68}
+};
+
+// Human BMI equivalent calculator
+// Uses dog body fat % estimates per BCS and maps to human BMI
+// Published veterinary correlations: BCS 5 ~ 18-22% body fat (healthy)
+// Each BCS point above 5 adds approx 10-12% body fat
+function getHumanEquivalent(dogWeightLbs, bcs, breedKey) {
+  const breed = BREED_IDEAL[breedKey];
+  if (!breed) return null;
+
+  // Ideal dog weight midpoint
+  const idealMid = (breed.min + breed.max) / 2;
+
+  // Estimate current body fat % based on BCS
+  // BCS 5 = ~20% body fat, each point +/- ~10%
+  const bodyFatPct = 20 + (bcs - 5) * 10;
+  const clampedBF = Math.max(5, Math.min(85, bodyFatPct));
+
+  // Human height for comparison (inches) -- use breed-matched height
+  const heightIn = breed.human_height;
+  const heightM = heightIn * 0.0254;
+
+  // Map dog body fat % to human BMI equivalent
+  // Human healthy BMI 18.5-24.9 ~ 18-22% body fat
+  // Scale: dog BF% / 20 * 22 (healthy human BMI midpoint)
+  const humanBMI = (clampedBF / 20) * 22;
+  const humanWeightKg = humanBMI * heightM * heightM;
+  const humanWeightLbs = Math.round(humanWeightKg * 2.205);
+
+  // Healthy human weight range for that height
+  const healthyLow = Math.round(18.5 * heightM * heightM * 2.205);
+  const healthyHigh = Math.round(24.9 * heightM * heightM * 2.205);
+
+  return {
+    humanWeightLbs,
+    healthyLow,
+    healthyHigh,
+    heightIn,
+    heightFt: Math.floor(heightIn/12),
+    heightInRem: heightIn % 12,
+    bmi: Math.round(humanBMI * 10) / 10,
+    excessLbs: bcs > 5 ? Math.round(humanWeightLbs - healthyHigh) : 0
+  };
+}
+
+// Walk calorie estimator (veterinary METs formula)
+// Based on: NRC nutrient requirements, published canine exercise physiology
+// Calories = body weight (kg) x MET x duration (hours) x 0.95
+const WALK_METS = {stroll:2.0, brisk:3.5, power:5.0};
+function calcWalkCalories(weightLbs, minutes, pace) {
+  const weightKg = weightLbs * 0.4536;
+  const hours = minutes / 60;
+  const met = WALK_METS[pace] || 3.5;
+  return Math.round(weightKg * met * hours * 0.95);
 }
 
 // -------------------------------------------------------------
@@ -954,7 +1110,7 @@ async function runAnalysis() {
     sidePhotoData: images.side ? ('data:' + images.side.mediaType + ';base64,' + images.side.data) : null,
   };
 
-  renderResults(bcs, info, name, aiData, breedName);
+  renderResults(bcs, info, name, aiData, breedName, getBreedKey(), weight);
   goStep(6);
   saveToHistory(lastResult);
 }
@@ -971,7 +1127,7 @@ const CAT_COLORS = {
 };
 const CAT_LABELS = {food:'Nutrition', treat:'Treats', walk:'Exercise', watch:'Monitor', vet:'Veterinary'};
 
-function renderResults(bcs, info, name, ai, breedName) {
+function renderResults(bcs, info, name, ai, breedName, breedKey, weight) {
   const dev = bcs - 5;
   const statusText = dev===0 ? 'Ideal weight' : dev<0 ? Math.abs(dev)+' point'+(Math.abs(dev)>1?'s':'')+' below ideal' : dev+' point'+(dev>1?'s':'')+' above ideal';
   let html = '';
@@ -1079,7 +1235,151 @@ function renderResults(bcs, info, name, ai, breedName) {
 
   html += '</div>';
 
+  // --- SECTION 7: Breed Weight Comparison (always if breed selected) ---
+  const breedData = BREED_IDEAL[breedKey];
+  if (breedData && breedName) {
+    const currentWeightLbs = weight ? parseFloat(weight.replace(/[^0-9.]/g,'')) : null;
+    const useWeight = currentWeightLbs && currentWeightLbs > 0 ? currentWeightLbs : (breedData.min + breedData.max) / 2;
+    const humanEq = getHumanEquivalent(useWeight, bcs, breedKey);
+
+    if (humanEq) {
+      const isOverweight = bcs > 5;
+      const isIdeal = bcs === 5;
+      const bgColor = isIdeal ? '#E2F2EC' : isOverweight ? '#FDF0E8' : '#EEF4FB';
+      const insightColor = isIdeal ? '#1A5040' : isOverweight ? '#7A3010' : '#1A4060';
+      const insightBg = isIdeal ? '#E2F2EC' : isOverweight ? '#FDF0E8' : '#EEF4FB';
+
+      let insightText = '';
+      if (bcs === 5) {
+        insightText = name + ' is at a healthy weight for a ' + breedName + '. If they were human, they would be a fit, healthy ' + humanEq.heightFt + '\'' + humanEq.heightInRem + '" person weighing about ' + humanEq.humanWeightLbs + ' lbs -- right in the healthy range of ' + humanEq.healthyLow + '-' + humanEq.healthyHigh + ' lbs.';
+      } else if (bcs > 5) {
+        insightText = 'In human terms, ' + name + '\'s current weight is equivalent to a ' + humanEq.heightFt + '\'' + humanEq.heightInRem + '" person carrying about ' + humanEq.humanWeightLbs + ' lbs -- roughly ' + humanEq.excessLbs + ' lbs above a healthy weight. The same excess fat that affects a human at that weight is placing the same proportional stress on ' + name + '\'s joints, heart, and organs.';
+      } else {
+        insightText = 'In human terms, ' + name + '\'s current weight is equivalent to a ' + humanEq.heightFt + '\'' + humanEq.heightInRem + '" person weighing about ' + humanEq.humanWeightLbs + ' lbs -- below the healthy range of ' + humanEq.healthyLow + '-' + humanEq.healthyHigh + ' lbs. Building back to ideal weight will restore energy levels and long-term resilience.';
+      }
+
+      html += '<div class="results-section">';
+      html += '<div class="section-label">Weight in Perspective: ' + breedName + ' vs. Human</div>';
+      html += '<div class="breed-compare">';
+      html += '<div class="compare-grid">';
+
+      // Dog column
+      html += '<div class="compare-col dog-col">';
+      html += '<div class="compare-icon">&#128054;</div>';
+      html += '<div class="compare-label">' + (breedName || 'Dog') + '</div>';
+      html += '<div class="compare-weight" style="color:' + info.color + ';">' + (currentWeightLbs ? Math.round(currentWeightLbs) + ' lbs' : Math.round(breedData.min) + '-' + Math.round(breedData.max) + ' lbs') + '</div>';
+      html += '<div class="compare-sub">BCS ' + bcs + ' / 9<br>Ideal: ' + breedData.min + '-' + breedData.max + ' lbs</div>';
+      html += '</div>';
+
+      // Human column
+      const humanBgColor = bcs > 5 ? '#FDF0E8' : bcs < 5 ? '#EEF4FB' : '#E2F2EC';
+      const humanTextColor = bcs > 5 ? '#B0621A' : bcs < 5 ? '#1A5C8A' : '#2A7A5A';
+      html += '<div class="compare-col human-col" style="background:' + humanBgColor + '">';
+      html += '<div class="compare-icon">&#128100;</div>';
+      html += '<div class="compare-label">Human equivalent</div>';
+      html += '<div class="compare-weight" style="color:' + humanTextColor + ';">' + humanEq.humanWeightLbs + ' lbs</div>';
+      html += '<div class="compare-sub">' + humanEq.heightFt + '\'' + humanEq.heightInRem + '" tall<br>Healthy: ' + humanEq.healthyLow + '-' + humanEq.healthyHigh + ' lbs</div>';
+      html += '</div>';
+      html += '</div>';
+
+      // Insight text
+      html += '<div class="compare-insight" style="background:' + insightBg + ';color:' + insightColor + ';">' + insightText + '</div>';
+      html += '</div></div>';
+    }
+  }
+
+  // --- SECTION 8: Walk Calorie Estimator (BCS 6-9 only) ---
+  if (bcs >= 6) {
+    const defaultWeight = weight ? parseFloat(weight.replace(/[^0-9.]/g,'')) : (breedData ? Math.round((breedData.min + breedData.max) / 2) : 50);
+    const safeWeight = (defaultWeight && defaultWeight > 0) ? defaultWeight : 50;
+
+    html += '<div class="results-section">';
+    html += '<div class="section-label">Walk Calorie Estimator</div>';
+    html += '<div class="walk-estimator">';
+    html += '<div class="walk-header">How many calories does a walk burn?</div>';
+    html += '<div class="walk-sub">Walking is one of the safest and most effective ways to help ' + name + ' lose weight. Use this tool to estimate calories burned per walk and track your weekly progress.</div>';
+
+    html += '<div class="walk-controls">';
+    html += '<div class="walk-control">';
+    html += '<label class="walk-ctrl-label" for="walk-weight">Dog weight (lbs)</label>';
+    html += '<input class="walk-input" type="number" id="walk-weight" value="' + safeWeight + '" min="1" max="300" oninput="updateWalkCalc()">';
+    html += '</div>';
+    html += '<div class="walk-control">';
+    html += '<label class="walk-ctrl-label" for="walk-minutes">Walk duration (minutes)</label>';
+    html += '<input class="walk-input" type="number" id="walk-minutes" value="30" min="5" max="180" oninput="updateWalkCalc()">';
+    html += '</div>';
+    html += '</div>';
+
+    html += '<div class="walk-control" style="margin-bottom:14px;">';
+    html += '<label class="walk-ctrl-label">Pace</label>';
+    html += '<div class="walk-pace-btns">';
+    html += '<button class="walk-pace-btn" data-pace="stroll" onclick="setWalkPace(this)">Stroll</button>';
+    html += '<button class="walk-pace-btn on" data-pace="brisk" onclick="setWalkPace(this)">Brisk</button>';
+    html += '<button class="walk-pace-btn" data-pace="power" onclick="setWalkPace(this)">Power walk</button>';
+    html += '</div></div>';
+
+    html += '<div class="walk-result">';
+    html += '<div class="walk-calories" id="walk-cal-result">--</div>';
+    html += '<div class="walk-cal-label">calories burned per walk</div>';
+    html += '<div class="walk-context" id="walk-context"></div>';
+    html += '</div>';
+
+    html += '<div class="walk-weekly" id="walk-weekly"></div>';
+
+    html += '<div style="font-size:11px;color:#4A7A6D;margin-top:10px;font-style:italic;">Based on published canine exercise physiology (NRC). Estimates vary by individual dog, terrain, and fitness level. Always consult your vet before starting a new exercise program.</div>';
+    html += '</div></div>';
+  }
+
   document.getElementById('result-content').innerHTML = html;
+
+  // Trigger initial walk calc after DOM is set
+  if (bcs >= 6) {
+    setTimeout(updateWalkCalc, 50);
+  }
+}
+
+// -------------------------------------------------------------
+// WALK CALCULATOR LOGIC
+// -------------------------------------------------------------
+var currentWalkPace = 'brisk';
+
+function setWalkPace(btn) {
+  document.querySelectorAll('.walk-pace-btn').forEach(function(b) { b.classList.remove('on'); });
+  btn.classList.add('on');
+  currentWalkPace = btn.dataset.pace;
+  updateWalkCalc();
+}
+
+function updateWalkCalc() {
+  const weightInput = document.getElementById('walk-weight');
+  const minutesInput = document.getElementById('walk-minutes');
+  const resultEl = document.getElementById('walk-cal-result');
+  const contextEl = document.getElementById('walk-context');
+  const weeklyEl = document.getElementById('walk-weekly');
+
+  if (!weightInput || !minutesInput || !resultEl) return;
+
+  const weightLbs = parseFloat(weightInput.value) || 50;
+  const minutes = parseFloat(minutesInput.value) || 30;
+  const calories = calcWalkCalories(weightLbs, minutes, currentWalkPace);
+
+  resultEl.textContent = calories;
+
+  // Contextual message
+  const dailyWalks = 2;
+  const dailyCal = calories * dailyWalks;
+  const weekCal = dailyCal * 7;
+  const lbsPerWeek = (weekCal / 3500 * 0.7).toFixed(2); // 3500 cal/lb, dogs burn fat more efficiently
+
+  contextEl.textContent = minutes + ' min ' + currentWalkPace.replace('power','power ') + ' walk. Two walks per day = ' + dailyCal + ' cal/day burned through exercise.';
+
+  // Weekly breakdown
+  if (weeklyEl) {
+    weeklyEl.innerHTML =
+      '<div class="walk-week-item"><div class="walk-week-num">' + dailyCal + '</div><div class="walk-week-lbl">cal/day (2 walks)</div></div>' +
+      '<div class="walk-week-item"><div class="walk-week-num">' + weekCal + '</div><div class="walk-week-lbl">cal/week</div></div>' +
+      '<div class="walk-week-item"><div class="walk-week-num">~' + lbsPerWeek + ' lb</div><div class="walk-week-lbl">est. loss/week</div></div>';
+  }
 }
 
 // -------------------------------------------------------------
@@ -1264,6 +1564,19 @@ function printReport() {
     ? '<div style="background:#FAEAE8;border:1px solid #E8B8B4;border-radius:4px;padding:12px;margin-bottom:16px;"><div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:#C0392B;margin-bottom:8px;">Long-term health risks at BCS '+r.bcs+'</div>'+HEALTH_RISKS.map(risk=>'<div style="font-size:11px;color:#7A2020;padding:3px 0;border-top:1px solid #F0C4C0;line-height:1.4;">&middot; '+risk+'</div>').join('')+'</div>'
     : '';
 
+  // Breed comparison for print
+  const breedKey = r.breed ? Object.keys(BREED_IDEAL).find(k => {
+    const bd = BREED_IDEAL[k];
+    return bd && r.breed && r.breed.toLowerCase().includes(k.replace(/_/g,' ').split(' ')[0].toLowerCase());
+  }) : null;
+  const breedDataPrint = breedKey ? BREED_IDEAL[breedKey] : null;
+  const currentWeightPrint = r.weight ? parseFloat(r.weight.replace(/[^0-9.]/g,'')) : null;
+  const useWeightPrint = (currentWeightPrint && currentWeightPrint > 0) ? currentWeightPrint : (breedDataPrint ? (breedDataPrint.min + breedDataPrint.max) / 2 : null);
+  const humanEqPrint = (breedDataPrint && useWeightPrint) ? getHumanEquivalent(useWeightPrint, r.bcs, breedKey) : null;
+
+  const breedCompareHtml = humanEqPrint ? '<div style="background:#E6EFEC;border-radius:4px;padding:12px;margin-bottom:16px;"><div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#4A7A6D;margin-bottom:8px;">Weight in Perspective</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div style="text-align:center;background:#fff;border-radius:4px;padding:10px;"><div style="font-size:11px;font-weight:700;color:#2D5147;margin-bottom:4px;">'+r.name+' ('+r.breed+')</div><div style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:'+info.color+';">'+(currentWeightPrint?Math.round(currentWeightPrint)+' lbs':breedDataPrint.min+'-'+breedDataPrint.max+' lbs')+'</div><div style="font-size:10px;color:#7A9990;">Ideal: '+breedDataPrint.min+'-'+breedDataPrint.max+' lbs</div></div><div style="text-align:center;background:#fff;border-radius:4px;padding:10px;"><div style="font-size:11px;font-weight:700;color:#1A5C8A;margin-bottom:4px;">Human equivalent</div><div style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#1A5C8A;">'+humanEqPrint.humanWeightLbs+' lbs</div><div style="font-size:10px;color:#7A9990;">'+humanEqPrint.heightFt+"'"+humanEqPrint.heightInRem+'" tall | Healthy: '+humanEqPrint.healthyLow+'-'+humanEqPrint.healthyHigh+' lbs</div></div></div></div>'
+  : '';
+
   const insightsHtml = ai.photoInsights && ai.photoInsights.length
     ? ai.photoInsights.map(obs=>'<div style="font-size:11px;color:#3D5C54;padding:4px 0;border-top:1px solid #C5D8D2;line-height:1.4;display:flex;gap:8px;"><span style="width:5px;height:5px;background:#2D5147;border-radius:50%;display:inline-block;margin-top:4px;flex-shrink:0;"></span><span>'+obs+'</span></div>').join('')
     : '';
@@ -1332,7 +1645,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;color:#1C3530;background:#fff
   </div>
 </div>
 
-${ai.weightRange ? '<div class="section"><div class="section-ttl">Ideal Weight Range for '+r.name+'</div><div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#2A7A5A;">'+ai.weightRange+'</div><div style="font-size:11px;color:#3D5C54;margin-top:4px;line-height:1.5;">'+(ai.weightRationale||'')+'</div>'+(ai.timelineEstimate?'<div style="font-size:10px;color:#7A9990;font-style:italic;margin-top:4px;">'+ai.timelineEstimate+'</div>':'')+'</div>' : ''}
+${breedCompareHtml}${ai.weightRange ? '<div class="section"><div class="section-ttl">Ideal Weight Range for '+r.name+'</div><div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#2A7A5A;">'+ai.weightRange+'</div><div style="font-size:11px;color:#3D5C54;margin-top:4px;line-height:1.5;">'+(ai.weightRationale||'')+'</div>'+(ai.timelineEstimate?'<div style="font-size:10px;color:#7A9990;font-style:italic;margin-top:4px;">'+ai.timelineEstimate+'</div>':'')+'</div>' : ''}
 
 <div class="section">
   <div class="section-ttl">Assessment Findings</div>
