@@ -716,22 +716,24 @@ function previewImg(inputId, previewId, zoneId, badgeId, warnId) {
     document.getElementById(badgeId).style.display = 'inline-block';
     images[key] = { data: e.target.result.split(',')[1], mediaType: file.type || 'image/jpeg', name: file.name };
 
-    // Lenient quality hints -- warn but never block
+    // Photo quality check -- clear feedback to user before submitting
     const warnEl = document.getElementById(warnId);
-    const warns = [];
-    if (file.size < 30000) warns.push('This photo appears to be very small -- the AI will still analyze it but a larger image may give better results.');
-    // Check image dimensions leniently
     const tempImg = new Image();
     tempImg.onload = () => {
-      if (tempImg.width < 200 || tempImg.height < 200) {
-        warns.push('Image resolution appears low. If possible, try a higher-resolution photo for best AI analysis.');
-      }
-      if (warns.length > 0) {
-        warnEl.textContent = 'Tip: ' + warns.join(' ') + ' Your photo has been accepted and will be analyzed.';
-        warnEl.classList.add('visible');
+      const w = tempImg.width, h = tempImg.height;
+      const warnEl2 = document.getElementById(warnId);
+      if (!warnEl2) return;
+      if (file.size < 30000 || w < 200 || h < 200) {
+        warnEl2.innerHTML = '<strong>Photo too small for AI analysis.</strong> Please use a photo taken directly with your phone camera. Screenshots and heavily cropped images will not give reliable weight estimates.';
+        warnEl2.classList.add('visible');
+        zone.classList.add('photo-warn');
+      } else if (file.size < 80000 || w < 400 || h < 400) {
+        warnEl2.innerHTML = "<strong>Tip:</strong> This photo is lower resolution than ideal. A clearer photo at your dog's shoulder height in natural light will give a more accurate weight estimate -- but this one will still be analyzed.";
+        warnEl2.classList.add('visible');
         zone.classList.add('photo-warn');
       } else {
-        warnEl.classList.remove('visible');
+        warnEl2.classList.remove('visible');
+        zone.classList.remove('photo-warn');
       }
     };
     tempImg.src = e.target.result;
@@ -948,35 +950,62 @@ function buildMessages(name, weight, bcs, info, breedName, resizedImages) {
   const breedAdj = getBreedAdjustment();
   const breedAdjNote = breedAdj !== 0 ? `\nNote: BCS has been adjusted by ${breedAdj > 0 ? '+' : ''}${breedAdj} points for breed-specific norms (${breedName}).` : '';
 
-  const systemPrompt = `You are a veterinary nutrition and body condition expert. You help dog owners understand their dog's BCS and provide practical, breed-aware guidance. Always be warm, encouraging, and precise. When photos are provided, describe specific visual indicators you observe -- be descriptive even if photo quality is imperfect, do not refuse to analyze. Always provide a plausible weight loss or gain range.`;
+  const systemPrompt = `You are like a brilliant, caring friend who happens to have deep expertise in veterinary nutrition and canine health. You talk like a trusted vet friend over coffee -- honest, warm, direct, practical. You give real answers, not hedged disclaimers. When photos are provided, you carefully analyze them to estimate the dog's actual current body weight. You look for: overall body size relative to breed norms, rib cage definition and shadowing under the coat, fat pad thickness on flanks and loin, waist tuck depth from the side, muscle mass over hindquarters, and coat thickness adjustment. You always provide a specific numeric weight estimate with a confidence range. You always state clearly how much weight the dog needs to lose or gain and give a realistic timeline. Never refuse to estimate even with imperfect photos -- do your best and explain your confidence clearly.`;
 
-  const textPrompt = `Dog profile: "${name}", ${sex}, ${age} age${breedStr}, ${altered}${weightStr}.
+  const breedIdealNote = (() => {
+    var bk = document.getElementById('dog-breed') ? document.getElementById('dog-breed').value : '';
+    var bd = typeof BREED_IDEAL !== 'undefined' && BREED_IDEAL[bk] ? BREED_IDEAL[bk] : null;
+    if (!bd || !breedName) return '';
+    var sx = state.sex || 'unknown';
+    var adj = sx === 'female' ? 0.88 : sx === 'male' ? 1.0 : 0.94;
+    return '\nBreed weight standard for ' + breedName + ' (' + (sx !== 'unknown' ? sx : 'avg') + '): ' + Math.round(bd.min*(adj+0.06)) + '-' + Math.round(bd.max*adj) + ' lbs.';
+  })();
 
-Questionnaire findings:
-- Side belly appearance: ${state.side_belly||5}/9
-- Top-down waist shape: ${state.top_waist||5}/9
-- Rib palpation: ${state.ribs||5}/9
+  const textPrompt = `Dog: "${name}", ${sex}, ${age}, ${altered}${breedStr}${weightStr ? ', current weight: ' + weightStr.replace(', current weight: ','') : ''}.` + breedIdealNote + `
+
+Assessment scores (1=very thin, 5=ideal, 9=severely obese):
+- Side belly silhouette: ${state.side_belly||5}/9
+- Top waist shape: ${state.top_waist||5}/9
+- Rib palpation resistance: ${state.ribs||5}/9
 - Spine palpation: ${state.spine||5}/9
 - Hip bone palpation: ${state.hips||5}/9
 - Calculated BCS: ${bcs}/9 (${info.label})${breedAdjNote}
-${hasPhotos ? `\nPhotos uploaded: ${Object.keys(images).join(' and ')} view -- analyze them directly. Even if photo quality is imperfect, provide your best visual assessment.` : '\nNo photos uploaded -- base all visual observations on questionnaire answers only.'}
+` + (hasPhotos
+  ? '\nPHOTOS UPLOADED: ' + Object.keys(images).join(' and ') + ' view. Analyze these photos carefully to estimate current body weight. Look for: body proportions relative to breed size, rib cage definition or shadowing under coat, fat pad thickness on flanks and loin, depth of waist tuck, muscle mass over hindquarters, coat thickness. Cross-reference with questionnaire and breed standards.'
+  : '\nNO PHOTOS: Base the weight estimate on questionnaire scores, reported weight if given, and breed standards.') + `
 
-Respond with a JSON object (no markdown, no code fences) with exactly these keys:
+Respond with ONLY a valid JSON object, no markdown, no explanation:
 {
-  "photoInsights": ["observation 1", "observation 2", "observation 3"],
-  "weightRange": "X-Y lbs (A-B kg)",
-  "weightRangeDirection": "lose or gain or maintain",
-  "weightRationale": "2 sentence explanation of the estimate",
-  "personalizedGuidance": "3-4 warm practical sentences tailored to this specific dog including breed considerations",
-  "timelineEstimate": "Realistic timeline e.g. With consistent effort, reaching ideal BCS may take 3-5 months",
-  "vetSummary": "A professional 3-4 sentence clinical summary suitable for inclusion in a veterinary report. Use objective clinical language."
+  "photoInsights": ["specific observation 1", "specific observation 2", "specific observation 3"],
+  "photoAnalyzed": true,
+  "estimatedWeightLbs": 65,
+  "estimatedWeightKg": 29.5,
+  "weightLowLbs": 60,
+  "weightHighLbs": 70,
+  "weightConfidence": "moderate",
+  "weightConfidenceReason": "One sentence explaining confidence and what drove it.",
+  "weightVisualCues": ["specific cue 1", "specific cue 2", "specific cue 3"],
+  "idealWeightLbs": "55-65",
+  "weightToLoseOrGain": "10-15 lbs",
+  "weightRange": "55-65 lbs (25-29 kg)",
+  "weightRangeDirection": "lose",
+  "weightRationale": "Two sentences explaining the ideal weight for this specific dog.",
+  "timelineEstimate": "At safe rate of 1-1.5% body weight per week, reaching ideal BCS will take approximately X-Y months.",
+  "personalizedGuidance": "3-4 sentences like advice from a knowledgeable friend. Use the dog's name. Be specific and warm.",
+  "vetSummary": "Clinical note: BCS score, estimated current weight with confidence, weight to lose/gain, ideal weight target, primary recommendation."
 }
 
 Rules:
-- photoInsights: if photos provided give 3 specific visual observations from the images, even if quality is imperfect -- describe what you can see. If no photos, prefix each with 'Based on owner description: '
-- weightRange: if BCS 5 use "0 lbs (0 kg)". Otherwise give a realistic range based on breed and size norms. Use current weight if provided.
-- personalizedGuidance: mention breed-specific considerations if relevant. Keep under 90 words.
-- vetSummary: write as if authoring a clinical note. Include BCS, key physical findings, and primary recommendation.`;
+- estimatedWeightLbs: a NUMBER for current body weight. If owner provided weight use it as ground truth. If not, estimate from photos and breed norms.
+- weightLowLbs/weightHighLbs: confidence band as numbers. High=+/-5%, Moderate=+/-10%, Low=+/-18%.
+- weightConfidence: exactly "high", "moderate", or "low".
+- weightToLoseOrGain: REQUIRED -- the single most important number for the owner. A string like "12-18 lbs" or "0 lbs" if ideal. Never omit.
+- weightVisualCues: 3 concrete specific observations, not generic. E.g. "Rib cage not visible and shows no shadowing" not "dog appears overweight."
+- photoInsights: if photos provided describe 3 specific visual observations from the images. If no photos prefix each with "Based on your description: ".
+- photoAnalyzed: true if photos were provided, false if not.
+- timelineEstimate: always include specific months calculated from weightToLoseOrGain at 1-1.5% per week.
+- personalizedGuidance: warm friend tone, dog's name, specific to breed and situation, under 90 words.
+- vetSummary: clinical and precise, include all key numbers for the vet report.`;
 
   const content = [];
   if (resizedImages.side) content.push({ type: 'image', source: { type: 'base64', media_type: resizedImages.side.mediaType, data: resizedImages.side.data }});
@@ -1152,21 +1181,118 @@ function renderResults(bcs, info, name, ai, breedName) {
   html += '</div><div class="bar-labels"><span>1 &middot; Emaciated</span><span>5 &middot; Ideal</span><span>9 &middot; Severely obese</span></div>';
   html += '</div>';
 
-  // SECTION 2: Ideal Weight
-  if (ai && ai.weightRange) {
-    var dirColor = ai.weightRangeDirection === 'maintain' ? '#2A7A5A' : ai.weightRangeDirection === 'lose' ? '#B0621A' : '#2A7A5A';
-    var subNote = ai.weightRangeDirection === 'lose'
-      ? 'Your dog is currently carrying excess weight. The range above is the healthy target to work toward.'
-      : ai.weightRangeDirection === 'gain'
-      ? 'Your dog is currently underweight. The range above is the healthy target to work toward.'
-      : 'Great news -- your dog is already within their ideal weight range!';
-    html += '<div class="results-section"><div class="section-label">What a healthy weight looks like for ' + name + '</div>';
-    html += '<div class="weight-callout" style="border-left-color:' + dirColor + ';">';
-    html += '<div style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:' + dirColor + ';">' + ai.weightRange + '</div>';
-    html += '<div style="font-size:13px;color:#1C3530;margin-top:6px;line-height:1.55;">' + (ai.weightRationale || '') + '</div>';
-    html += '<div style="font-size:13px;color:#3D5C54;margin-top:6px;font-style:italic;">' + subNote + '</div>';
-    if (ai.timelineEstimate) html += '<div style="margin-top:8px;font-size:12px;color:#4A6B62;font-style:italic;">' + ai.timelineEstimate + '</div>';
-    html += '</div></div>';
+  // SECTION 2: Photo weight estimate + ideal weight + weight to lose
+  var hasPhotoEst = !!(ai && ai.estimatedWeightLbs && ai.photoAnalyzed);
+  var hasAnyEst   = !!(ai && (ai.estimatedWeightLbs || ai.weightRange));
+
+  if (hasAnyEst) {
+    var estLbs  = ai.estimatedWeightLbs ? Math.round(ai.estimatedWeightLbs) : null;
+    var estKg   = estLbs ? (Math.round(estLbs * 0.4536 * 10) / 10) : null;
+    var lowLbs  = ai.weightLowLbs  ? Math.round(ai.weightLowLbs)  : null;
+    var highLbs = ai.weightHighLbs ? Math.round(ai.weightHighLbs) : null;
+    var conf    = ai.weightConfidence || 'moderate';
+    var cCol    = conf==='high' ? '#2A7A5A' : conf==='low' ? '#7A9990' : '#B0621A';
+    var cBg     = conf==='high' ? '#E2F2EC' : conf==='low' ? '#F4F4F4' : '#FAF0E6';
+    var cLbl    = conf==='high' ? 'High confidence' : conf==='low' ? 'Estimate only' : 'Moderate confidence';
+    var dir     = ai.weightRangeDirection || 'maintain';
+    var dCol    = dir === 'maintain' ? '#2A7A5A' : dir === 'lose' ? '#B0621A' : '#2A7A5A';
+    var hBadgeBg  = hasPhotoEst ? '#E2F2EC' : '#FAF0E6';
+    var hBadgeCol = hasPhotoEst ? '#1A5040' : '#6B3A10';
+    var hBadgeTxt = hasPhotoEst ? 'AI Photo Analysis' : 'Assessment-Based Estimate';
+    var hHeaderTxt = hasPhotoEst ? 'Weight estimated from your photos' : 'Weight estimate';
+
+    html += '<div class="results-section">';
+    html += '<div class="section-label">Weight estimate for ' + name + '</div>';
+
+    // Card outer
+    html += '<div style="background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:0;">';
+
+    // Dark green header bar
+    html += '<div style="background:#2D5147;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;">';
+    html += '<div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:#C8DDD7;">' + hHeaderTxt + '</div>';
+    html += '<div style="font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px;background:' + hBadgeBg + ';color:' + hBadgeCol + ';">' + hBadgeTxt + '</div>';
+    html += '</div>';
+
+    // Card body
+    html += '<div style="padding:1rem 1.25rem;">';
+
+    // No-photo nudge
+    if (!hasPhotoEst && Object.keys(images).length === 0) {
+      html += '<div style="background:#E6EFEC;border-radius:4px;padding:10px 14px;font-size:13px;color:#1C3530;line-height:1.6;margin-bottom:12px;">Upload a clear side-view photo next time for a photo-based weight estimate. The numbers below are calculated from your questionnaire answers and breed standards.</div>';
+    }
+
+    // Estimated current weight - big number
+    if (estLbs) {
+      html += '<div style="margin-bottom:8px;">';
+      html += '<div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:#4A6B62;margin-bottom:4px;">Estimated current weight</div>';
+      html += '<div style="display:flex;align-items:baseline;gap:8px;">';
+      html += '<div style="font-family:Georgia,serif;font-size:40px;font-weight:700;color:#1C3530;line-height:1;">' + estLbs + '</div>';
+      html += '<div style="font-size:15px;color:#3D5C54;font-weight:600;">lbs &nbsp;/&nbsp; ' + estKg + ' kg</div>';
+      html += '</div></div>';
+
+      // Confidence band bar
+      if (lowLbs && highLbs && highLbs > lowLbs) {
+        var pct = Math.min(95, Math.max(5, (estLbs - lowLbs) / (highLbs - lowLbs) * 100));
+        html += '<div style="margin:10px 0 4px;">';
+        html += '<div style="width:100%;height:8px;background:#E6EFEC;border-radius:4px;position:relative;">';
+        html += '<div style="position:absolute;top:-5px;left:' + pct.toFixed(1) + '%;width:18px;height:18px;border-radius:50%;background:#2D5147;transform:translateX(-50%);border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);"></div>';
+        html += '</div>';
+        html += '<div style="display:flex;justify-content:space-between;font-size:11px;color:#3D5C54;font-weight:600;margin-top:6px;"><span>' + lowLbs + ' lbs</span><span style="font-size:10px;color:#4A6B62;">estimated range</span><span>' + highLbs + ' lbs</span></div>';
+        html += '</div>';
+      }
+
+      // Confidence indicator
+      html += '<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:4px;background:' + cBg + ';margin-top:8px;margin-bottom:14px;">';
+      html += '<div style="width:9px;height:9px;border-radius:50%;background:' + cCol + ';flex-shrink:0;margin-top:3px;"></div>';
+      html += '<div style="font-size:12px;color:#1C3530;line-height:1.5;"><strong style="color:' + cCol + ';">' + cLbl + '</strong> &mdash; ' + (ai.weightConfidenceReason || '') + '</div>';
+      html += '</div>';
+    }
+
+    // WEIGHT TO LOSE/GAIN -- the most important number, highlighted prominently
+    if (ai.weightToLoseOrGain) {
+      if (dir === 'maintain') {
+        html += '<div style="background:#E2F2EC;border-left:4px solid #2A7A5A;border-radius:4px;padding:12px 14px;margin-bottom:12px;">';
+        html += '<div style="font-size:13px;font-weight:700;color:#1A5040;">Great news -- ' + name + ' is at an ideal weight! Keep doing what you\'re doing.</div>';
+        html += '</div>';
+      } else {
+        var tlBg  = dir === 'lose' ? '#FAF0E6' : '#EEF4FB';
+        var tlCol = dir === 'lose' ? '#B0621A' : '#1A5C8A';
+        var tlLbl = dir === 'lose' ? 'Weight to lose to reach ideal' : 'Weight to gain to reach ideal';
+        html += '<div style="background:' + tlBg + ';border-left:4px solid ' + tlCol + ';border-radius:4px;padding:12px 14px;margin-bottom:12px;">';
+        html += '<div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:' + tlCol + ';margin-bottom:4px;">' + tlLbl + '</div>';
+        html += '<div style="font-family:Georgia,serif;font-size:30px;font-weight:700;color:' + tlCol + ';line-height:1.1;">' + ai.weightToLoseOrGain + '</div>';
+        if (ai.timelineEstimate) {
+          html += '<div style="font-size:13px;color:#1C3530;margin-top:8px;line-height:1.55;">' + ai.timelineEstimate + '</div>';
+        }
+        html += '</div>';
+      }
+    }
+
+    // Ideal weight range
+    if (ai.weightRange) {
+      html += '<div style="margin-bottom:12px;">';
+      html += '<div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:#4A6B62;margin-bottom:4px;">Ideal weight range for ' + name + '</div>';
+      html += '<div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#2D5147;">' + ai.weightRange + '</div>';
+      html += '<div style="font-size:12px;color:#1C3530;margin-top:4px;line-height:1.55;">' + (ai.weightRationale || '') + '</div>';
+      html += '</div>';
+    }
+
+    // Visual cues that drove the estimate
+    if (ai.weightVisualCues && ai.weightVisualCues.length) {
+      html += '<div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;">';
+      html += '<div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:#1C3530;margin-bottom:6px;">';
+      html += hasPhotoEst ? 'What the AI observed in your photos' : 'What drove this estimate';
+      html += '</div>';
+      ai.weightVisualCues.forEach(function(cue) {
+        html += '<div style="display:flex;gap:8px;font-size:12px;color:#1C3530;margin-bottom:5px;line-height:1.45;">';
+        html += '<div style="width:5px;height:5px;border-radius:50%;background:#2D5147;margin-top:5px;flex-shrink:0;"></div>';
+        html += '<div>' + cue + '</div></div>';
+      });
+      html += '</div>';
+    }
+
+    html += '<div style="font-size:11px;color:#7A9990;font-style:italic;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;">Weight estimates are approximations based on visual analysis and breed standards. Accuracy improves with a clear side photo and known current weight. Always confirm with a veterinary scale.</div>';
+    html += '</div></div></div>'; // close body, card, section
   }
 
   // SECTION 3: Photo insights
@@ -1573,6 +1699,7 @@ function printReport() {
         <div class="info-row"><span class="info-label">Breed:</span> ${breedName || 'Not specified'}</div>
         <div class="info-row"><span class="info-label">Age group:</span> ${r.age || 'Not specified'}</div>
         <div class="info-row"><span class="info-label">Reproductive status:</span> ${r.altered==='yes'?'Spayed/Neutered':r.altered==='no'?'Intact':'Not specified'}</div>
+        <div class="info-row"><span class="info-label">Sex:</span> ${r.sex ? (r.sex.charAt(0).toUpperCase() + r.sex.slice(1)) : 'Not specified'}</div>
         ${r.weight ? `<div class="info-row"><span class="info-label">Reported weight:</span> ${r.weight}</div>` : ''}
         <div style="margin-top:12px;">${photoHtml}</div>
       </div>
@@ -1588,6 +1715,29 @@ function printReport() {
         </div>
       </div>
     </div>
+
+    <!-- Weight to lose / gain -- most important callout -->
+    ${(ai.weightToLoseOrGain && ai.weightRangeDirection !== 'maintain') ? `
+    <div style="margin-bottom:16px;background:${ai.weightRangeDirection==='lose'?'#FAF0E6':'#EEF4FB'};border-left:4px solid ${ai.weightRangeDirection==='lose'?'#B0621A':'#1A5C8A'};border-radius:4px;padding:14px 16px;">
+      <div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:${ai.weightRangeDirection==='lose'?'#B0621A':'#1A5C8A'};margin-bottom:6px;">${ai.weightRangeDirection==='lose'?'Weight to lose to reach ideal':'Weight to gain to reach ideal'}</div>
+      <div style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:${ai.weightRangeDirection==='lose'?'#B0621A':'#1A5C8A'};line-height:1.1;">${ai.weightToLoseOrGain}</div>
+      <div style="font-size:11px;color:#1C3530;margin-top:8px;line-height:1.5;">${ai.timelineEstimate||''}</div>
+      ${ai.weightRange ? `<div style="font-size:11px;color:#3D5C54;margin-top:4px;">Ideal weight range: ${ai.weightRange}</div>` : ''}
+    </div>` : (ai.weightRangeDirection==='maintain' ? `
+    <div style="margin-bottom:16px;background:#E2F2EC;border-left:4px solid #2A7A5A;border-radius:4px;padding:14px 16px;">
+      <div style="font-size:13px;font-weight:700;color:#1A5040;">${r.name} is at an ideal weight. ${ai.weightRange ? 'Ideal range: ' + ai.weightRange + '.' : ''}</div>
+    </div>` : '')}
+
+    <!-- Photo analysis results -->
+    ${(r.hasSidePhoto || r.hasTopPhoto) ? `
+    <div style="margin-bottom:16px;background:#E6EFEC;border-radius:4px;padding:12px 14px;">
+      <div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:#2D5147;margin-bottom:6px;">AI Photo Analysis</div>
+      <div style="font-size:11px;color:#1C3530;line-height:1.5;margin-bottom:4px;">Photos analyzed: ${r.hasSidePhoto?'Side profile':''}${r.hasSidePhoto&&r.hasTopPhoto?' + ':'' }${r.hasTopPhoto?'Top-down':''}. Confidence: ${ai.weightConfidence||'moderate'}. ${ai.weightConfidenceReason||''}</div>
+      ${ai.weightVisualCues && ai.weightVisualCues.length ? ai.weightVisualCues.map(c=>'<div style="font-size:11px;color:#3D5C54;margin-top:2px;padding-left:8px;">&#8226; '+c+'</div>').join('') : ''}
+    </div>` : `
+    <div style="margin-bottom:16px;background:#FAF0E6;border-radius:4px;padding:10px 14px;">
+      <div style="font-size:11px;color:#6B3A10;line-height:1.5;"><strong>No photos were uploaded.</strong> Upload a clear side-view photo for a more accurate weight estimate in your next assessment.</div>
+    </div>`}
 
     <!-- Assessment findings -->
     <div style="margin-bottom:16px;">
@@ -1614,8 +1764,8 @@ function printReport() {
           <div style="font-size:12px;color:#3D5C54;">Score: ${state.hips||'--'}/9</div>
         </div>
         ${ai.weightRange ? `<div>
-          <div style="font-size:10px;font-weight:600;color:#4A7A6D;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Weight ${ai.weightRangeDirection==='lose'?'to lose':ai.weightRangeDirection==='gain'?'to gain':'status'}</div>
-          <div style="font-family:Georgia,serif;font-size:15px;font-weight:700;color:#2D5147;">${ai.weightRange}</div>
+          <div style="font-size:10px;font-weight:600;color:#4A7A6D;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Est. current weight</div>
+          <div style="font-family:Georgia,serif;font-size:15px;font-weight:700;color:#2D5147;">${ai.estimatedWeightLbs ? Math.round(ai.estimatedWeightLbs) + ' lbs' : (ai.weightRange || '--')}</div>
         </div>` : ''}
       </div>
     </div>
