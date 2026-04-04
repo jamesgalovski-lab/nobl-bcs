@@ -950,7 +950,9 @@ function buildMessages(name, weight, bcs, info, breedName, resizedImages) {
   const breedAdj = getBreedAdjustment();
   const breedAdjNote = breedAdj !== 0 ? `\nNote: BCS has been adjusted by ${breedAdj > 0 ? '+' : ''}${breedAdj} points for breed-specific norms (${breedName}).` : '';
 
-  const systemPrompt = `You are like a brilliant, caring friend who happens to have deep expertise in veterinary nutrition and canine health. You talk like a trusted vet friend over coffee -- honest, warm, direct, practical. You give real answers, not hedged disclaimers. When photos are provided, you carefully analyze them to estimate the dog's actual current body weight. You look for: overall body size relative to breed norms, rib cage definition and shadowing under the coat, fat pad thickness on flanks and loin, waist tuck depth from the side, muscle mass over hindquarters, and coat thickness adjustment. You always provide a specific numeric weight estimate with a confidence range. You always state clearly how much weight the dog needs to lose or gain and give a realistic timeline. Never refuse to estimate even with imperfect photos -- do your best and explain your confidence clearly.`;
+  const systemPrompt = `You are like a brilliant, caring friend who happens to have deep expertise in veterinary nutrition and canine health. You talk like a trusted vet friend over coffee -- honest, warm, direct, practical. You give real answers, not hedged disclaimers. You use the dog's name throughout, like you actually know them.
+
+PHOTOS: When photos are provided, you MUST analyze them carefully to estimate the dog's actual current body weight. Study every detail: overall body size and frame relative to breed standards, rib cage definition and shadowing visible under or through the coat, fat pad thickness on the flanks and loin area, depth of the waist tuck viewed from the side, muscle mass and definition over the hindquarters and rear, and how thick the coat appears to be (which affects how much it hides body condition). Cross-reference everything with the breed's published weight standards and the questionnaire responses. You ALWAYS provide a specific numeric weight estimate with a confidence range. You ALWAYS state clearly and prominently how many pounds the dog needs to lose or gain, and you give a realistic timeline in months. Never refuse to estimate -- do your best and describe your confidence clearly.`;
 
   const breedIdealNote = (() => {
     var bk = document.getElementById('dog-breed') ? document.getElementById('dog-breed').value : '';
@@ -971,7 +973,7 @@ Assessment scores (1=very thin, 5=ideal, 9=severely obese):
 - Hip bone palpation: ${state.hips||5}/9
 - Calculated BCS: ${bcs}/9 (${info.label})${breedAdjNote}
 ` + (hasPhotos
-  ? '\nPHOTOS UPLOADED: ' + Object.keys(images).join(' and ') + ' view. Analyze these photos carefully to estimate current body weight. Look for: body proportions relative to breed size, rib cage definition or shadowing under coat, fat pad thickness on flanks and loin, depth of waist tuck, muscle mass over hindquarters, coat thickness. Cross-reference with questionnaire and breed standards.'
+  ? '\nPHOTOS PROVIDED: ' + Object.keys(images).join(' and ') + ' view photo(s) are attached to this message. ANALYZE THESE PHOTOS NOW. Look carefully at the actual dog in the image(s). Estimate the current body weight by examining: body frame size relative to ' + (breedName || 'this breed') + ' standards, visibility or shadowing of rib cage through the coat, fat pad thickness visible on the flanks and loin, the depth of the abdominal tuck seen from the side, muscle mass over the hindquarters, and apparent coat thickness. Your photoInsights must describe what you actually see in these specific photos -- not generic breed characteristics. Your weightVisualCues must reference specific visual details from the photos. Set photoAnalyzed: true.'
   : '\nNO PHOTOS: Base the weight estimate on questionnaire scores, reported weight if given, and breed standards.') + `
 
 Respond with ONLY a valid JSON object, no markdown, no explanation:
@@ -1181,8 +1183,30 @@ function renderResults(bcs, info, name, ai, breedName) {
   html += '</div><div class="bar-labels"><span>1 &middot; Emaciated</span><span>5 &middot; Ideal</span><span>9 &middot; Severely obese</span></div>';
   html += '</div>';
 
+  // WEIGHT TO LOSE/GAIN CALLOUT -- most important number, shown first
+  if (ai && ai.weightToLoseOrGain) {
+    var dir0 = ai.weightRangeDirection || 'maintain';
+    if (dir0 === 'maintain') {
+      html += '<div style="background:#E2F2EC;border-left:4px solid #2A7A5A;border-radius:6px;padding:14px 18px;margin-bottom:1rem;">';
+      html += '<div style="font-size:13px;font-weight:700;color:#1A5040;">Great news &mdash; ' + name + ' is at an ideal weight! Keep doing what you\'re doing.</div>';
+      html += '</div>';
+    } else {
+      var tlBg0  = dir0 === 'lose' ? '#FAF0E6' : '#EEF4FB';
+      var tlCol0 = dir0 === 'lose' ? '#B0621A' : '#1A5C8A';
+      var tlBdr0 = dir0 === 'lose' ? '#B0621A' : '#1A5C8A';
+      var tlLbl0 = dir0 === 'lose' ? name + ' needs to lose weight' : name + ' needs to gain weight';
+      html += '<div style="background:' + tlBg0 + ';border-left:4px solid ' + tlBdr0 + ';border-radius:6px;padding:14px 18px;margin-bottom:1rem;">';
+      html += '<div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:' + tlCol0 + ';margin-bottom:2px;">' + tlLbl0 + '</div>';
+      html += '<div style="font-family:Georgia,serif;font-size:38px;font-weight:700;color:' + tlCol0 + ';line-height:1.1;">' + ai.weightToLoseOrGain + '</div>';
+      if (ai.timelineEstimate) {
+        html += '<div style="font-size:13px;color:#1C3530;margin-top:8px;line-height:1.55;">' + ai.timelineEstimate + '</div>';
+      }
+      html += '</div>';
+    }
+  }
+
   // SECTION 2: Photo weight estimate + ideal weight + weight to lose
-  var hasPhotoEst = !!(ai && ai.estimatedWeightLbs && ai.photoAnalyzed);
+  var hasPhotoEst = !!(ai && ai.estimatedWeightLbs && (ai.photoAnalyzed || Object.keys(images).length > 0));
   var hasAnyEst   = !!(ai && (ai.estimatedWeightLbs || ai.weightRange));
 
   if (hasAnyEst) {
@@ -1246,26 +1270,6 @@ function renderResults(bcs, info, name, ai, breedName) {
       html += '<div style="width:9px;height:9px;border-radius:50%;background:' + cCol + ';flex-shrink:0;margin-top:3px;"></div>';
       html += '<div style="font-size:12px;color:#1C3530;line-height:1.5;"><strong style="color:' + cCol + ';">' + cLbl + '</strong> &mdash; ' + (ai.weightConfidenceReason || '') + '</div>';
       html += '</div>';
-    }
-
-    // WEIGHT TO LOSE/GAIN -- the most important number, highlighted prominently
-    if (ai.weightToLoseOrGain) {
-      if (dir === 'maintain') {
-        html += '<div style="background:#E2F2EC;border-left:4px solid #2A7A5A;border-radius:4px;padding:12px 14px;margin-bottom:12px;">';
-        html += '<div style="font-size:13px;font-weight:700;color:#1A5040;">Great news -- ' + name + ' is at an ideal weight! Keep doing what you\'re doing.</div>';
-        html += '</div>';
-      } else {
-        var tlBg  = dir === 'lose' ? '#FAF0E6' : '#EEF4FB';
-        var tlCol = dir === 'lose' ? '#B0621A' : '#1A5C8A';
-        var tlLbl = dir === 'lose' ? 'Weight to lose to reach ideal' : 'Weight to gain to reach ideal';
-        html += '<div style="background:' + tlBg + ';border-left:4px solid ' + tlCol + ';border-radius:4px;padding:12px 14px;margin-bottom:12px;">';
-        html += '<div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:' + tlCol + ';margin-bottom:4px;">' + tlLbl + '</div>';
-        html += '<div style="font-family:Georgia,serif;font-size:30px;font-weight:700;color:' + tlCol + ';line-height:1.1;">' + ai.weightToLoseOrGain + '</div>';
-        if (ai.timelineEstimate) {
-          html += '<div style="font-size:13px;color:#1C3530;margin-top:8px;line-height:1.55;">' + ai.timelineEstimate + '</div>';
-        }
-        html += '</div>';
-      }
     }
 
     // Ideal weight range
@@ -1638,7 +1642,19 @@ function printReport() {
   const statusText = dev===0?'Ideal weight':dev<0?`${Math.abs(dev)} point${Math.abs(dev)>1?'s':''} below ideal`:`${dev} point${dev>1?'s':''} above ideal`;
 
   const recs = RECS[r.bcs] || RECS[5];
-  const recsHtml = recs.map(rec => `<li style="margin-bottom:5px;font-size:12px;color:#333;line-height:1.5;">${rec}</li>`).join('');
+  // Group recs by category for colored headers in PDF
+  const recGrouped = {};
+  recs.forEach(function(rec) {
+    var cat = rec.c || 'General';
+    if (!recGrouped[cat]) recGrouped[cat] = [];
+    recGrouped[cat].push(rec);
+  });
+  const recCatColors = { Nutrition:'#2D5147', Treats:'#B0621A', Exercise:'#1A5C8A', Monitor:'#6B3FA0', Veterinary:'#A0281E' };
+  const recCatBg    = { Nutrition:'#E6EFEC', Treats:'#FAF0E6', Exercise:'#E6F1F8', Monitor:'#F5F0FB', Veterinary:'#FDF0F0' };
+  const recsHtml = CAT_ORDER.filter(cat => recGrouped[cat]).map(cat => {
+    var items = recGrouped[cat].map(r2 => `<div style="font-size:11px;color:#1C3530;padding:5px 0 5px 10px;border-top:1px solid ${recCatBg[cat]||'#eee'};line-height:1.55;">&#8226; ${r2.t}</div>`).join('');
+    return `<div style="margin-bottom:8px;"><div style="font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:${recCatColors[cat]||'#333'};background:${recCatBg[cat]||'#eee'};padding:4px 8px;border-radius:3px;margin-bottom:0;">${cat}</div>${items}</div>`;
+  }).join('');
 
   const healthRisksHtml = r.bcs >= 7
     ? `<div style="background:#FAEAE8;border:1px solid #E8B8B4;border-radius:4px;padding:14px;margin-bottom:16px;">
@@ -1788,13 +1804,8 @@ function printReport() {
     <!-- Recommendations -->
     <div style="margin-bottom:16px;">
       <div class="section-title">Recommended action steps</div>
-      <ol style="padding-left:18px;">${recsHtml}</ol>
+      ${recsHtml}
     </div>
-
-    <!-- Timeline -->
-    ${ai.timelineEstimate ? `<div style="font-size:12px;color:#3D5C54;font-style:italic;margin-bottom:16px;padding:10px 14px;background:#E6EFEC;border-radius:4px;">
-      Timeline: ${ai.timelineEstimate}
-    </div>` : ''}
 
     <!-- Signature lines -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:24px;margin-bottom:16px;">
