@@ -789,7 +789,7 @@ function getBreedIdealRange(breedKey) {
   var sx = state.sex || 'unknown';
   // Use sex-specific AKC ranges directly -- no multiplier math
   var range = sx === 'female' ? bd.f : sx === 'male' ? bd.m : [Math.round((bd.m[0]+bd.f[0])/2), Math.round((bd.m[1]+bd.f[1])/2)];
-  return { min: range[0], max: range[1], hh: bd.hh };
+  return { min: range[0], max: range[1], };
 }
 
 function getHumanEquivalent(dogWeightLbs, bcs, breedKey) {
