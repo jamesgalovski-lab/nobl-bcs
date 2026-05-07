@@ -1424,6 +1424,9 @@ function renderResults(bcs, info, name, ai, breedName) {
       var humanBg = bcs > 5 ? '#FDF0E8' : bcs < 5 ? '#EEF4FB' : '#E2F2EC';
       var humanColor = bcs > 5 ? '#B0621A' : bcs < 5 ? '#1A5C8A' : '#2A7A5A';
 
+      var _sexLabel = sx === 'male' ? 'male' : sx === 'female' ? 'female' : 'avg';
+      var _humanHeight = sx === 'male' ? "6'0\"" : sx === 'female' ? "5'6\"" : "5'9\"";
+
       var insightText = bcs === 5
         ? name + ' is at a healthy weight for a ' + breedName + '. In human terms, that\u2019s like a ' + _humanHeight + ' ' + _sexLabel + ' weighing about ' + humanEq.humanWeightLbs + ' lbs -- right in the healthy range of ' + humanEq.healthyLow + '-' + humanEq.healthyHigh + ' lbs.'
         : bcs > 5
@@ -1442,8 +1445,6 @@ function renderResults(bcs, info, name, ai, breedName) {
       var dogSVG = '<img src="' + _dogImgs[_dogImgKey] + '" style="width:90px;height:auto;display:block;margin:0 auto;" alt="Dog BCS ' + bcs + '/9" />';
       var humanSVG = dogSVG; // humanSVG unused in new layout -- dog shown in stats grid
 
-      var _sexLabel = sx === 'male' ? 'male' : sx === 'female' ? 'female' : 'avg';
-      var _humanHeight = sx === 'male' ? "6'0\"" : sx === 'female' ? "5'6\"" : "5'9\"";
       html += '<div class="results-section"><div class="section-label">What ' + name + "'s weight looks like in human terms</div>";
       html += '<div class="breed-compare">';
       // Two-column layout: dog silhouette left, stats right (human top, dog bottom)
