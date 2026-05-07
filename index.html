@@ -832,15 +832,22 @@ function getBreedIdealRange(breedKey) {
 function getHumanEquivalent(dogWeightLbs, bcs, breedKey) {
   var bd = BREED_IDEAL[breedKey];
   if (!bd) return null;
-  // Sex-appropriate human height baseline: male=72in (6'0"), female=66in (5'6")
+  // Sex-appropriate human height: male=72in (6'0"), female=66in (5'6")
   var sx = state.sex || 'unknown';
   var heightIn = sx === 'male' ? 72 : sx === 'female' ? 66 : 69;
   var heightM = heightIn * 0.0254;
-  var bodyFatPct = Math.max(5, Math.min(85, 20 + (bcs - 5) * 10));
-  var humanBMI = (bodyFatPct / 20) * 22;
-  var humanWeightLbs = Math.round(humanBMI * heightM * heightM * 2.205);
-  var healthyLow = Math.round(18.5 * heightM * heightM * 2.205);
+  // Healthy BMI range for this height
+  var healthyLow  = Math.round(18.5 * heightM * heightM * 2.205);
   var healthyHigh = Math.round(24.9 * heightM * heightM * 2.205);
+  var healthyMid  = (healthyLow + healthyHigh) / 2;  // ~BMI 21.7 midpoint
+  // Map dog's proportional deviation from ideal to human weight.
+  // Each BCS point away from 5 = ~10% body weight change in dogs.
+  // We apply the same proportion to the human healthy midpoint.
+  var bcsOffset  = bcs - 5;                          // -4 to +4
+  var proportion = bcsOffset * 0.10;                  // e.g. BCS4 = -10%, BCS7 = +20%
+  var humanWeightLbs = Math.round(healthyMid * (1 + proportion));
+  // Clamp to a plausible display range (never below 90 lbs or above 350 lbs)
+  humanWeightLbs = Math.max(90, Math.min(350, humanWeightLbs));
   return {
     humanWeightLbs: humanWeightLbs,
     healthyLow: healthyLow,
