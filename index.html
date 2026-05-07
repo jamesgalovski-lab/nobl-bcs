@@ -1439,6 +1439,7 @@ function renderResults(bcs, info, name, ai, breedName) {
       var insightText = bcs === 5
         ? name + ' is at a healthy weight for a ' + breedName + '. In human terms, that\u2019s like a ' + _humanHeight + ' ' + _sexLabel + ' weighing about ' + humanEq.humanWeightLbs + ' lbs -- right in the healthy range of ' + humanEq.healthyLow + '-' + humanEq.healthyHigh + ' lbs.'
         : bcs > 5
+     }
         ? 'In human terms, ' + name + '\u2019s weight is like a ' + _humanHeight + ' ' + _sexLabel + ' carrying about ' + humanEq.humanWeightLbs + ' lbs -- roughly ' + humanEq.excessLbs + ' lbs above a healthy weight. The same proportional stress that puts on a human body is what ' + name + '\u2019s joints, heart, and organs are experiencing right now.'
         : 'In human terms, ' + name + '\u2019s weight is like a ' + _humanHeight + ' ' + _sexLabel + ' weighing about ' + humanEq.humanWeightLbs + ' lbs -- below the healthy range of ' + humanEq.healthyLow + '-' + humanEq.healthyHigh + ' lbs. Building back to ideal weight will restore energy and long-term resilience.';
 
