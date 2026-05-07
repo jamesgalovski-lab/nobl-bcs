@@ -1428,6 +1428,14 @@ function renderResults(bcs, info, name, ai, breedName) {
       var humanBg = bcs > 5 ? '#FDF0E8' : bcs < 5 ? '#EEF4FB' : '#E2F2EC';
       var humanColor = bcs > 5 ? '#B0621A' : bcs < 5 ? '#1A5C8A' : '#2A7A5A';
 
+     if (!humanEq) {
+      // skip insight or use a fallback string
+      var insightText = name + ' — breed not recognized for human-equivalent comparison.';
+     } else {
+       var _humanHeight = humanEq.heightFt + "'" + humanEq.heightInRem + '"';
+       var _sexLabel = state.sex === 'male' ? 'man'
+              : state.sex === 'female' ? 'woman'
+              : 'person';      
       var insightText = bcs === 5
         ? name + ' is at a healthy weight for a ' + breedName + '. In human terms, that\u2019s like a ' + _humanHeight + ' ' + _sexLabel + ' weighing about ' + humanEq.humanWeightLbs + ' lbs -- right in the healthy range of ' + humanEq.healthyLow + '-' + humanEq.healthyHigh + ' lbs.'
         : bcs > 5
