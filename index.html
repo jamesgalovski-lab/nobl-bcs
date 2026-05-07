@@ -796,7 +796,7 @@ function getHumanEquivalent(dogWeightLbs, bcs, breedKey) {
   var bd = BREED_IDEAL[breedKey];
   if (!bd) return null;
   var sx = state.sex || 'unknown';
-  var heightIn = sx === 'male' ? 72 : sx === 'female' ? 66 : 69;
+  var heightIn = sx === 'male' ? 70 : sx === 'female' ? 66 : 69;
   var heightM = heightIn * 0.0254;
 
   // Healthy BMI range (CDC/WHO: 18.5–24.9)
