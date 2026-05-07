@@ -596,48 +596,13 @@ const ALL_BREEDS = [
   {v:'mixed_large',l:'Mixed breed -- large'},{v:'other',l:'Other / Unknown'}
 ];
 
-function showBreedList() {
-  const q = document.getElementById('breed-search').value.trim().toLowerCase();
-  const dd = document.getElementById('breed-dropdown');
-  const filtered = q ? ALL_BREEDS.filter(b => b.l.toLowerCase().includes(q)) : ALL_BREEDS;
-  renderBreedDropdown(filtered);
-  dd.style.display = filtered.length ? 'block' : 'none';
-}
-
-function filterBreeds() {
-  showBreedList();
-}
-
-function renderBreedDropdown(breeds) {
-  const dd = document.getElementById('breed-dropdown');
-  dd.innerHTML = breeds.map(b =>
-    `<div onclick="selectBreed('${b.v}','${b.l.replace(/'/g,"&#39;")}')"
-      style="padding:9px 14px;font-size:13px;color:#3D5C54;cursor:pointer;border-top:1px solid #E6EFEC;"
-      onmouseover="this.style.background='#E6EFEC'" onmouseout="this.style.background=''">${b.l}</div>`
-  ).join('');
-}
-
-function selectBreed(value, label) {
-  document.getElementById('dog-breed').value = value;
-  document.getElementById('breed-search').value = label;
-  document.getElementById('breed-dropdown').style.display = 'none';
-  const sel = document.getElementById('breed-selected');
-  sel.textContent = 'Selected: ' + label;
-  sel.style.display = 'block';
-  onBreedChange();
-}
-
-function onBreedChange() {
-  const breed = document.getElementById('dog-breed').value;
-  const noteEl = document.getElementById('breed-note');
-  if (BREED_NOTES[breed]) {
-    noteEl.textContent = BREED_NOTES[breed].note;
-    noteEl.classList.add('visible');
-  } else {
-    noteEl.classList.remove('visible');
-  }
-}
-
+<div class="field-group">
+      <label class="field-label">Breed</label>
+      <input class="text-input" id="breed-search" type="text" placeholder="Type to search breed (e.g. Labrador, Pug)..." autocomplete="off" oninput="filterBreeds()" onfocus="showBreedList()" style="margin-bottom:0;" />
+      <input type="hidden" id="dog-breed" value="" />
+      <div id="breed-dropdown" style="display:none;border:1px solid #C5D8D2;border-top:none;border-radius:0 0 4px 4px;background:#fff;max-height:220px;overflow-y:auto;"></div>
+      <div id="breed-selected" style="display:none;margin-top:6px;padding:6px 12px;background:#E6EFEC;border-radius:4px;font-size:13px;color:#2D5147;font-weight:600;"></div>
+    </div>
 function getBreedAdjustment() {
   const breed = document.getElementById('dog-breed').value;
   return BREED_NOTES[breed] ? BREED_NOTES[breed].adjust : 0;
